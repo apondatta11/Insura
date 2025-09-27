@@ -1,8 +1,11 @@
+import HeroBanner from '@/Pages/Home/HeroBanner'
 import React from 'react'
 
 const HomeLayout = () => {
   return (
-    <div>HomeLayout</div>
+    <div>
+      <HeroBanner></HeroBanner>
+    </div>
   )
 }
 
