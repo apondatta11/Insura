@@ -12,7 +12,9 @@ import DashboardHome from "@/Pages/DashboardHome/DashboardHome";
 import MerchantRoute from "@/Routes/MerchantRoute";
 import ManagePolicies from "@/Pages/Dashboard/Merchant/ManagePolicies/ManagePolicies";
 import AllPolicies from "@/Pages/Public/AllPolicies";
-import PolicyDetails from "@/Pages/Dashboard/Merchant/PolicyDetails/PolicyDetails";
+import PolicyDetails from "@/Pages/Public/PolicyDetails/PolicyDetails";
+import Quotes from "@/Pages/Private/Quotes/Quotes";
+import ApplicationForm from "@/Pages/Private/ApplicationForm/ApplicationForm";
 
 export const router = createBrowserRouter([
   {
@@ -29,13 +31,27 @@ export const router = createBrowserRouter([
       },
       {
         path: "/policies/:id",
-        element: <PolicyDetails></PolicyDetails>
+        element: <PolicyDetails></PolicyDetails>,
+      },
+      {
+        path: "/quotes/:id",
+        element: (
+          <PrivateRoute>
+            <Quotes></Quotes>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/apply/:id",
+        element: (
+          <PrivateRoute>
+            <ApplicationForm></ApplicationForm>
+          </PrivateRoute>
+        ),
       },
       {
         path: "merchant/policies",
-        element: (
-          <ManagePolicies />
-        ),
+        element: <ManagePolicies />,
       },
     ],
   },

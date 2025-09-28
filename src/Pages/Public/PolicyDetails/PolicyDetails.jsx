@@ -495,13 +495,15 @@ const PolicyDetails = () => {
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button 
+                                <Link to={`/quotes/${policy._id}`} className="btn rounded-xl w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-6">
+                                {/* <Button 
                                     className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-6"
                                     onClick={() => navigate(`/quote/${policy._id}`)}
-                                >
+                                > */}
                                     <Calculator className="w-5 h-5 mr-2" />
                                     Get Personalized Quote
-                                </Button>
+                                {/* </Button> */}
+                                </Link>
                             </CardFooter>
                         </Card>
 

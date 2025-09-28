@@ -286,7 +286,7 @@ const AllPolicies = () => {
                                     key={policy._id} 
                                     className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:scale-105 group cursor-pointer hover:border-primary/30"
                                 >
-                                    <Link to={`/policy/${policy._id}`}>
+                                    {/* <Link to={`/policy/${policy._id}`}> */}
                                         {/* Policy Image */}
                                         <div className="relative h-48 overflow-hidden">
                                             <img
@@ -356,14 +356,16 @@ const AllPolicies = () => {
                                         </CardContent>
 
                                         <CardFooter>
-                                            <Link to={`/policies/${policy._id}`}>
-                                            <Button className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 border-0">
+                                            <Link to={`/policies/${policy._id}`}
+                                            className="btn w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 border-0"
+                                            >
+                                            {/* <Button className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 border-0"> */}
                                                 <Sparkles className="w-4 h-4 mr-2" />
                                                 View Details
-                                            </Button>
+                                            {/* </Button> */}
                                             </Link>
                                         </CardFooter>
-                                    </Link>
+                                    {/* </Link> */}
                                 </Card>
                             ))}
                         </div>
