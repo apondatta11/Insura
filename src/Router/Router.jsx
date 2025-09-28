@@ -12,6 +12,7 @@ import DashboardHome from "@/Pages/DashboardHome/DashboardHome";
 import MerchantRoute from "@/Routes/MerchantRoute";
 import ManagePolicies from "@/Pages/Dashboard/Merchant/ManagePolicies/ManagePolicies";
 import AllPolicies from "@/Pages/Public/AllPolicies";
+import PolicyDetails from "@/Pages/Dashboard/Merchant/PolicyDetails/PolicyDetails";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "/policies",
         element: <AllPolicies></AllPolicies>,
+      },
+      {
+        path: "/policies/:id",
+        element: <PolicyDetails></PolicyDetails>
       },
       {
         path: "merchant/policies",
