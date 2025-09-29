@@ -10,13 +10,15 @@ import DashboardLayout from "@/Layouts/DashboardLayout/DashboardLayout";
 import ErrorPage from "@/Pages/ErrorPage/ErrorPage";
 import DashboardHome from "@/Pages/DashboardHome/DashboardHome";
 import MerchantRoute from "@/Routes/MerchantRoute";
-import ManagePolicies from "@/Pages/Dashboard/Merchant/ManagePolicies/ManagePolicies";
+import ManagePolicies from "@/Pages/Dashboard/Admin/ManagePolicies/ManagePolicies";
 import AllPolicies from "@/Pages/Public/AllPolicies";
 import PolicyDetails from "@/Pages/Public/PolicyDetails/PolicyDetails";
 import Quotes from "@/Pages/Private/Quotes/Quotes";
 import ApplicationForm from "@/Pages/Private/ApplicationForm/ApplicationForm";
 import ManageUsers from "@/Pages/Dashboard/Admin/ManageUsers/ManageUsers";
 import ManageApplications from "@/Pages/Dashboard/Admin/ManageApplications/ManageApplications";
+import MyPolicies from "@/Pages/Dashboard/Customer/MyPolicies/MyPolicies";
+import AssignedCustomers from "@/Pages/Dashboard/Merchant/AssignedCustomers/AssignedCustomers";
 
 export const router = createBrowserRouter([
   {
@@ -57,14 +59,20 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dashboard/manage-users",
-        element: (
-            <ManageUsers />
-        ),
+        element: <ManageUsers />,
       },
       {
-    path: '/dashboard/manage-applications',
-    element: <ManageApplications />,
-}
+        path: "/dashboard/manage-applications",
+        element: <ManageApplications />,
+      },
+      {
+        path:"/dashboard/my-policies",
+        element: <MyPolicies></MyPolicies>
+      },
+      {
+        path:"/dashboard/assigned-customers",
+        element:<AssignedCustomers></AssignedCustomers>
+      },
     ],
   },
   {
