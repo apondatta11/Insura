@@ -23,3 +23,4 @@ export const showSuccessToast = (message) => {
         transition: Bounce,
     });
 };
+

@@ -1,163 +1,76 @@
-// import React, { useState } from 'react';
-// import { useForm } from 'react-hook-form';
-// import { Link, useLocation, useNavigate } from 'react-router';
-// import SocialLogin from '../Register/SocialLogin';
-// import useAuth from '@/Hooks/useAuth';
-// import { FaEye, FaEyeSlash } from 'react-icons/fa';
-
-// const Login = () => {
-//     const { register, handleSubmit, formState: { errors } } = useForm();
-//     const { signIn } = useAuth();
-//     const location = useLocation();
-//     const navigate = useNavigate();
-//     const from = location.state?.from || '/';
-//     const [showPassword, setShowPassword] = useState(false);
-//     const [emailValue, setEmailValue] = useState(''); 
-
-//     const onSubmit = data => {
-//         signIn(data.email, data.password)
-//             .then(result => {
-//                 navigate(from);
-//             })
-//             .catch(error => {
-//                 console.error('Login error:', error);
-//             });
-//     };
-
-//     return (
-//         <div className="min-h-screen flex items-center justify-center p-4">
-//             <div className="w-full max-w-md bg-card rounded-xl shadow-2xl overflow-hidden border border-border">
-//                 <div className="p-8">
-//                     <div className="text-center mb-8">
-//                         <h1 className="text-3xl font-bold text-primary">Welcome Back</h1>
-//                         <p className="text-muted-foreground mt-2">Sign in to your account</p>
-//                     </div>
-
-//                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-//                         {/* Email field */}
-//                         <div>
-//                             <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-//                                 Email Address
-//                             </label>
-//                             <input
-//                                 id="email"
-//                                 type="email"
-//                                 {...register('email', { required: true })}
-//                                 onChange={(e) => setEmailValue(e.target.value)} // Update email state
-//                                 className="w-full px-4 py-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-//                                 placeholder="your@email.com"
-//                             />
-//                             {errors.email?.type === 'required' && (
-//                                 <p className="mt-1 text-sm text-destructive">Email is required</p>
-//                             )}
-//                         </div>
-
-//                         {/* Password field */}
-//                         <div>
-//                             <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-//                                 Password
-//                             </label>
-//                             <div className="relative">
-//                                 <input
-//                                     id="password"
-//                                     type={showPassword ? 'text' : 'password'}
-//                                     {...register('password', { required: true, minLength: 6 })}
-//                                     className="w-full px-4 py-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-//                                     placeholder="••••••••"
-//                                 />
-//                                 <button
-//                                     type="button"
-//                                     onClick={() => setShowPassword(!showPassword)}
-//                                     className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground transition-colors"
-//                                 >
-//                                     {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
-//                                 </button>
-//                             </div>
-//                             {errors.password?.type === 'required' && (
-//                                 <p className="mt-1 text-sm text-destructive">Password is required</p>
-//                             )}
-//                             {errors.password?.type === 'minLength' && (
-//                                 <p className="mt-1 text-sm text-destructive">Password must be at least 6 characters</p>
-//                             )}
-//                         </div>
-
-//                         {/* Forgot password link */}
-//                         <div className="flex justify-end">
-//                             <Link
-//                                 to={`/auth/forgot-password?email=${encodeURIComponent(emailValue || '')}`}
-//                                 className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-//                             >
-//                                 Forgot password?
-//                             </Link>
-//                         </div>
-
-//                         {/* Submit button */}
-//                         <button
-//                             type="submit"
-//                             className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-//                         >
-//                             Sign In
-//                         </button>
-//                     </form>
-
-//                     {/* Register link */}
-//                     <div className="mt-6 text-center text-sm text-muted-foreground">
-//                         Don't have an account?{' '}
-//                         <Link
-//                             to="/auth/register"
-//                             state={{ from }}
-//                             className="font-medium text-primary hover:text-primary/80 transition-colors"
-//                         >
-//                             Register
-//                         </Link>
-//                     </div>
-
-//                     {/* Social login divider */}
-//                     <div className="relative my-6">
-//                         <div className="absolute inset-0 flex items-center">
-//                             <div className="w-full border-t border-border"></div>
-//                         </div>
-//                         <div className="relative flex justify-center text-sm">
-//                             <span className="px-2 bg-card text-muted-foreground">
-//                                 Or continue with
-//                             </span>
-//                         </div>
-//                     </div>
-
-//                     {/* Social login buttons */}
-//                     <SocialLogin />
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Login;
-
+//when user login save user to database 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 import SocialLogin from '../Register/SocialLogin';
 import useAuth from '@/Hooks/useAuth';
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
-
+import useAxios from '@/Hooks/useAxios';
+// import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { signIn } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+    const axiosInstance = useAxios();
     const from = location.state?.from || '/';
     const [showPassword, setShowPassword] = useState(false);
     const [emailValue, setEmailValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const saveUserToDB = async (user) => {
+        try {
+            const userData = {
+                name: user.displayName || 'User',
+                email: user.email,
+                photoURL: user.photoURL || '/default-avatar.png',
+                role: 'customer',
+                createdAt: new Date(),
+                lastLoggedAt: new Date()
+            };
+
+            await axiosInstance.put(`/users/${user.email}`, userData);
+            console.log('User saved/updated in database');
+        } catch (error) {
+            console.error('Error saving user to database:', error);
+        }
+    };
+
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
-            await signIn(data.email, data.password);
-            navigate(from);
+            const userCredential = await signIn(data.email, data.password);
+            const user = userCredential.user;
+            
+            await saveUserToDB(user);
+            
+            toast.success('✅ Login successful! Welcome back!');
+            
+            setTimeout(() => {
+                navigate(from, { replace: true });
+            }, 2000);
+            
         } catch (error) {
             console.error('Login error:', error);
+            let errorMessage = "Login failed. Please check your credentials.";
+            
+            switch (error.code) {
+                case "auth/user-not-found":
+                    errorMessage = "No account found with this email.";
+                    break;
+                case "auth/wrong-password":
+                    errorMessage = "Incorrect password. Please try again.";
+                    break;
+                case "auth/invalid-email":
+                    errorMessage = "Invalid email address format.";
+                    break;
+                case "auth/too-many-requests":
+                    errorMessage = "Too many failed attempts. Please try again later.";
+                    break;
+            }
+            
+            toast.error(`❌ ${errorMessage}`);
         } finally {
             setIsLoading(false);
         }
