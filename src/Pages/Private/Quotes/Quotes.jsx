@@ -640,7 +640,7 @@ const Quotes = () => {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/policy/${id}`)}
+                        onClick={() => navigate(`/policies/${id}`)}
                         className="border-border hover:bg-accent"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />

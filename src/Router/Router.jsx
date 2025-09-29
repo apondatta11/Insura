@@ -16,6 +16,7 @@ import PolicyDetails from "@/Pages/Public/PolicyDetails/PolicyDetails";
 import Quotes from "@/Pages/Private/Quotes/Quotes";
 import ApplicationForm from "@/Pages/Private/ApplicationForm/ApplicationForm";
 import ManageUsers from "@/Pages/Dashboard/Admin/ManageUsers/ManageUsers";
+import ManageApplications from "@/Pages/Dashboard/Admin/ManageApplications/ManageApplications";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
             <ManageUsers />
         ),
       },
+      {
+    path: '/dashboard/manage-applications',
+    element: <ManageApplications />,
+}
     ],
   },
   {
