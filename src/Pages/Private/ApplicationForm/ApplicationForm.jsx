@@ -42,6 +42,8 @@ const ApplicationForm = () => {
         address: '',
         city: '',
         postalCode: '',
+        occupation: '',
+        annualIncome: '',
         
         // Nominee Information
         nomineeName: '',
@@ -56,8 +58,6 @@ const ApplicationForm = () => {
         hasChronicDisease: false,
         
         // Additional Information
-        occupation: '',
-        annualIncome: '',
         height: '',
         weight: ''
     });
@@ -132,7 +132,7 @@ const ApplicationForm = () => {
         e.preventDefault();
         
         // Basic validation
-        if (!applicationData.fullName || !applicationData.email || !applicationData.nidNumber) {
+        if (!applicationData.fullName || !applicationData.email || !applicationData.nidNumber || !applicationData.annualIncome) {
             Swal.fire({
                 title: 'Missing Information',
                 text: 'Please fill in all required fields.',
@@ -211,9 +211,9 @@ const ApplicationForm = () => {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Increased gap from gap-4 to gap-6 */}
                                         <div className="space-y-3">
-                                            <Label htmlFor="fullName" className="text-sm font-semibold">
+                                            <Label htmlFor="fullName" className="text-sm font-semibold mb-2 block"> {/* Added mb-2 */}
                                                 Full Name *
                                             </Label>
                                             <Input
@@ -225,7 +225,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="email" className="text-sm font-semibold">
+                                            <Label htmlFor="email" className="text-sm font-semibold mb-2 block">
                                                 Email Address *
                                             </Label>
                                             <Input
@@ -238,7 +238,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="phone" className="text-sm font-semibold">
+                                            <Label htmlFor="phone" className="text-sm font-semibold mb-2 block">
                                                 Phone Number *
                                             </Label>
                                             <Input
@@ -251,7 +251,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="dateOfBirth" className="text-sm font-semibold">
+                                            <Label htmlFor="dateOfBirth" className="text-sm font-semibold mb-2 block">
                                                 Date of Birth *
                                             </Label>
                                             <Input
@@ -263,7 +263,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="nidNumber" className="text-sm font-semibold">
+                                            <Label htmlFor="nidNumber" className="text-sm font-semibold mb-2 block">
                                                 NID/Passport Number *
                                             </Label>
                                             <Input
@@ -275,7 +275,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="occupation" className="text-sm font-semibold">
+                                            <Label htmlFor="occupation" className="text-sm font-semibold mb-2 block">
                                                 Occupation *
                                             </Label>
                                             <Input
@@ -286,10 +286,23 @@ const ApplicationForm = () => {
                                                 required
                                             />
                                         </div>
+                                        <div className="space-y-3">
+                                            <Label htmlFor="annualIncome" className="text-sm font-semibold mb-2 block">
+                                                Annual Income ($) *
+                                            </Label>
+                                            <Input
+                                                id="annualIncome"
+                                                type="number"
+                                                value={applicationData.annualIncome}
+                                                onChange={(e) => handleInputChange('annualIncome', e.target.value)}
+                                                placeholder="Your annual income"
+                                                required
+                                            />
+                                        </div>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <Label htmlFor="address" className="text-sm font-semibold">
+                                        <Label htmlFor="address" className="text-sm font-semibold mb-2 block">
                                             Address *
                                         </Label>
                                         <Textarea
@@ -302,9 +315,9 @@ const ApplicationForm = () => {
                                         />
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-3">
-                                            <Label htmlFor="city" className="text-sm font-semibold">
+                                            <Label htmlFor="city" className="text-sm font-semibold mb-2 block">
                                                 City *
                                             </Label>
                                             <Input
@@ -316,7 +329,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="postalCode" className="text-sm font-semibold">
+                                            <Label htmlFor="postalCode" className="text-sm font-semibold mb-2 block">
                                                 Postal Code *
                                             </Label>
                                             <Input
@@ -343,9 +356,9 @@ const ApplicationForm = () => {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-3">
-                                            <Label htmlFor="nomineeName" className="text-sm font-semibold">
+                                            <Label htmlFor="nomineeName" className="text-sm font-semibold mb-2 block">
                                                 Nominee Name *
                                             </Label>
                                             <Input
@@ -357,7 +370,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="nomineeRelationship" className="text-sm font-semibold">
+                                            <Label htmlFor="nomineeRelationship" className="text-sm font-semibold mb-2 block">
                                                 Relationship *
                                             </Label>
                                             <Select 
@@ -377,7 +390,7 @@ const ApplicationForm = () => {
                                             </Select>
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="nomineePhone" className="text-sm font-semibold">
+                                            <Label htmlFor="nomineePhone" className="text-sm font-semibold mb-2 block">
                                                 Nominee Phone *
                                             </Label>
                                             <Input
@@ -406,10 +419,10 @@ const ApplicationForm = () => {
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="space-y-4">
-                                        <Label className="text-sm font-semibold">Health Conditions</Label>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <Label className="text-sm font-semibold mb-3 block">Health Conditions</Label> {/* Added mb-3 */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Increased gap from gap-3 to gap-4 */}
                                             {healthConditionsList.map((condition) => (
-                                                <div key={condition} className="flex items-center space-x-2">
+                                                <div key={condition} className="flex items-center space-x-3"> {/* Increased space-x-2 to space-x-3 */}
                                                     <Checkbox
                                                         id={condition}
                                                         checked={applicationData.healthConditions.includes(condition)}
@@ -428,9 +441,9 @@ const ApplicationForm = () => {
                                     <Separator />
 
                                     <div className="space-y-4">
-                                        <Label className="text-sm font-semibold">Lifestyle Information</Label>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center space-x-2">
+                                        <Label className="text-sm font-semibold mb-3 block">Lifestyle Information</Label> {/* Added mb-3 */}
+                                        <div className="space-y-4"> {/* Increased space-y-3 to space-y-4 */}
+                                            <div className="flex items-center space-x-3">
                                                 <Checkbox
                                                     id="hasSmokingHistory"
                                                     checked={applicationData.hasSmokingHistory}
@@ -442,7 +455,7 @@ const ApplicationForm = () => {
                                                     I have a history of smoking
                                                 </Label>
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-3">
                                                 <Checkbox
                                                     id="hasAlcoholHistory"
                                                     checked={applicationData.hasAlcoholHistory}
@@ -454,7 +467,7 @@ const ApplicationForm = () => {
                                                     I consume alcohol regularly
                                                 </Label>
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-3">
                                                 <Checkbox
                                                     id="hasFamilyHistory"
                                                     checked={applicationData.hasFamilyHistory}
@@ -466,7 +479,7 @@ const ApplicationForm = () => {
                                                     Family history of critical illnesses
                                                 </Label>
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-3">
                                                 <Checkbox
                                                     id="hasChronicDisease"
                                                     checked={applicationData.hasChronicDisease}
@@ -481,9 +494,9 @@ const ApplicationForm = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-3">
-                                            <Label htmlFor="height" className="text-sm font-semibold">
+                                            <Label htmlFor="height" className="text-sm font-semibold mb-2 block">
                                                 Height (cm)
                                             </Label>
                                             <Input
@@ -495,7 +508,7 @@ const ApplicationForm = () => {
                                             />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label htmlFor="weight" className="text-sm font-semibold">
+                                            <Label htmlFor="weight" className="text-sm font-semibold mb-2 block">
                                                 Weight (kg)
                                             </Label>
                                             <Input
@@ -524,13 +537,13 @@ const ApplicationForm = () => {
                                             type="button"
                                             variant="outline"
                                             onClick={() => navigate(`/quotes/${id}`, { state: { quoteData, estimatedPremium, policy } })}
-                                            className="flex-1 border-border hover:bg-accent"
+                                            className="flex-1 border-border hover:bg-accent py-3" // Added py-3 for equal height
                                         >
                                             Back to Quote
                                         </Button>
                                         <Button
                                             type="submit"
-                                            className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-6"
+                                            className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3" // Changed from py-6 to py-3 for equal height
                                             disabled={submitApplication.isLoading}
                                         >
                                             {submitApplication.isLoading ? (
@@ -550,10 +563,10 @@ const ApplicationForm = () => {
                             </Card>
                         </div>
 
-                        {/* Summary Sidebar */}
+                        {/* Summary Sidebar - REMOVED sticky positioning */}
                         <div className="space-y-6">
                             {/* Application Summary */}
-                            <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-2xl sticky top-6">
+                            <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-2xl"> {/* Removed sticky top-6 */}
                                 <CardHeader>
                                     <CardTitle className="text-lg">Application Summary</CardTitle>
                                 </CardHeader>
@@ -594,7 +607,7 @@ const ApplicationForm = () => {
                             </Card>
 
                             {/* Required Documents */}
-                            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                            <Card className="border-border/50 bg-card/50 backdrop-blur-sm"> {/* Removed sticky positioning */}
                                 <CardHeader>
                                     <CardTitle className="text-lg">Required Documents</CardTitle>
                                 </CardHeader>
