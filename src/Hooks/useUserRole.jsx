@@ -2,20 +2,37 @@ import { useQuery } from '@tanstack/react-query';
 import useAuth from './useAuth';
 import useAxiosSecure from './useAxiosSecure';
 
+// const useUserRole = () => {
+//     const { user, loading: authLoading } = useAuth();
+//     const axiosSecure = useAxiosSecure();
+
+//     const { data: role = 'user', isLoading: roleLoading, refetch } = useQuery({
+//         queryKey: ['userRole', user?.email],
+//         enabled: !authLoading && !!user?.email,
+//         queryFn: async () => {
+//             const res = await axiosSecure.get(`/users/${user.email}/role`);
+//             return res.data.role;
+//         },
+//     });
+
+//     return { role, roleLoading: authLoading || roleLoading, refetch };
+// };
+
+
+
 const useUserRole = () => {
     const { user, loading: authLoading } = useAuth();
     const axiosSecure = useAxiosSecure();
 
-    const { data: role = 'user', isLoading: roleLoading, refetch } = useQuery({
+    const { data: role = 'customer', isLoading: roleLoading, refetch } = useQuery({
         queryKey: ['userRole', user?.email],
         enabled: !authLoading && !!user?.email,
         queryFn: async () => {
-            const res = await axiosSecure.get(`/users/${user.email}/role`);
-            return res.data.role;
+            const res = await axiosSecure.get(`/users/${user.email}`);
+            return res.data.role || 'customer'; // Your API returns { role: 'customer' }
         },
     });
 
     return { role, roleLoading: authLoading || roleLoading, refetch };
 };
-
-export default useUserRole;
+ export default useUserRole;

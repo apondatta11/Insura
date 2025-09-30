@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
 import useAuth from "@/Hooks/useAuth";
+import useUserRole from "@/Hooks/useUserRole"; // Import useUserRole
 
 const BlogModal = ({
   isOpen,
@@ -14,7 +15,7 @@ const BlogModal = ({
   onInputChange,
   onSubmit,
   isLoading,
-  user, // Add user as a prop
+  user,
 }) => {
   if (!isOpen) return null;
 
@@ -90,7 +91,7 @@ const BlogModal = ({
               </label>
               <input
                 type="text"
-                value={user?.email} // Show email instead of formData.author
+                value={user?.email}
                 readOnly
                 className="input input-bordered w-full font-sans bg-muted border-border text-muted-foreground"
               />
@@ -159,84 +160,64 @@ const ManageBlogs = () => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    author: "", // This will be set when creating
+    author: "",
     category: "insurance-tips",
   });
 
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
-  const { user, role } = useAuth(); // Assuming you have role in your auth context
+  const { user } = useAuth();
+  const { role, roleLoading } = useUserRole(); // Use useUserRole hook
 
-  // Fetch blogs based on user role
-  //   const { data: blogs = [], isLoading, error } = useQuery({
-  //     queryKey: ['blogs', user?.email],
-  //     queryFn: async () => {
-  //       const endpoint = role === 'admin' ? '/blogs' : `/blogs?author=${user?.email}`;
-  //       const response = await axiosSecure.get(endpoint);
-  //       return response.data;
-  //     },
-  //     enabled: !!user?.email
-  //   });
-
-  //   // Create blog mutation
-  //   const createMutation = useMutation({
-  //     mutationFn: async (blogData) => {
-  //       const response = await axiosSecure.post('/blogs', blogData);
-  //       return response.data;
-  //     },
-  //     onSuccess: () => {
-  //       toast.success('Blog published successfully!');
-  //       setIsCreateModalOpen(false);
-  //       setFormData({ title: '', content: '', author: user?.displayName || user?.email, category: 'insurance-tips' });
-  //       queryClient.invalidateQueries(['blogs']);
-  //     },
-  //     onError: (error) => {
-  //       toast.error('Failed to publish blog: ' + error.message);
-  //     }
-  //   });
-
-  // In your ManageBlogs component, add these console logs:
+  // Fix the query to properly handle admin vs agent
   const {
     data: blogs = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["blogs", user?.email],
+    queryKey: ["blogs", user?.email, role],
     queryFn: async () => {
-      const endpoint =
-        role === "admin" ? "/blogs" : `/blogs?author=${user?.email}`;
+      console.log("📝 Fetching blogs for role:", role, "user:", user?.email);
+      
+      // Admin should see all blogs, agents should see only their blogs
+      let endpoint = "/blogs";
+      if (role === "agent") {
+        endpoint = `/blogs?author=${user?.email}`;
+      }
+      // For admin, no query parameter - gets all blogs
+      
       console.log("📝 Fetching blogs from:", endpoint);
       const response = await axiosSecure.get(endpoint);
-      console.log("✅ Blogs fetched:", response.data);
+      console.log("✅ Blogs fetched:", response.data.length);
       return response.data;
     },
-    enabled: !!user?.email,
+    enabled: !!user?.email && !roleLoading, // Wait for role to load
   });
 
-const createMutation = useMutation({
-  mutationFn: async (blogData) => {
-    console.log("📝 Creating blog:", blogData);
-    const response = await axiosSecure.post("/blogs", blogData);
-    console.log("✅ Blog created response:", response.data);
-    return response.data;
-  },
-  onSuccess: (data) => {
-    console.log("🎉 Blog creation successful:", data);
-    toast.success("Blog published successfully!");
-    setIsCreateModalOpen(false);
-    setFormData({
-      title: "",
-      content: "",
-      author: user?.email, // Use email consistently here too
-      category: "insurance-tips",
-    });
-    queryClient.invalidateQueries(["blogs"]);
-  },
-  onError: (error) => {
-    console.error("❌ Blog creation failed:", error);
-    toast.error("Failed to publish blog: " + error.message);
-  },
-});
+  const createMutation = useMutation({
+    mutationFn: async (blogData) => {
+      console.log("📝 Creating blog:", blogData);
+      const response = await axiosSecure.post("/blogs", blogData);
+      console.log("✅ Blog created response:", response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log("🎉 Blog creation successful:", data);
+      toast.success("Blog published successfully!");
+      setIsCreateModalOpen(false);
+      setFormData({
+        title: "",
+        content: "",
+        author: user?.email,
+        category: "insurance-tips",
+      });
+      queryClient.invalidateQueries(["blogs"]);
+    },
+    onError: (error) => {
+      console.error("❌ Blog creation failed:", error);
+      toast.error("Failed to publish blog: " + error.message);
+    },
+  });
 
   // Update blog mutation
   const updateMutation = useMutation({
@@ -271,11 +252,10 @@ const createMutation = useMutation({
   });
 
   const handleCreate = () => {
-    // Set author to email for consistency
     setFormData({
       title: "",
       content: "",
-      author: user?.email, // Use email here too
+      author: user?.email,
       category: "insurance-tips",
     });
     setIsCreateModalOpen(true);
@@ -314,13 +294,12 @@ const createMutation = useMutation({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Use email consistently for author
-    const blogAuthor = user?.email; // Always use email
+    const blogAuthor = user?.email;
 
     const blogData = {
       ...formData,
       publishDate: new Date().toISOString(),
-      author: blogAuthor, // This will now be the email
+      author: blogAuthor,
       totalVisits: 0,
       status: "published",
     };
@@ -342,7 +321,8 @@ const createMutation = useMutation({
     }));
   };
 
-  if (isLoading) {
+  // Show loading while role is being determined
+  if (roleLoading || isLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
         <div className="flex flex-col items-center gap-4">
@@ -368,6 +348,7 @@ const createMutation = useMutation({
       <Helmet>
         <title>Manage Blogs - Insurance Platform</title>
       </Helmet>
+      
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -402,6 +383,7 @@ const createMutation = useMutation({
           </button>
         </div>
       </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="card bg-card border border-border rounded-xl shadow-sm p-6">
@@ -497,13 +479,14 @@ const createMutation = useMutation({
           </div>
         </div>
       </div>
+
       {/* Blogs Table */}
       <div className="card bg-card border border-border rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-border">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-2xl font-serif font-bold text-foreground">
-                Your Blog Posts
+                {role === "admin" ? "All Blog Posts" : "Your Blog Posts"}
               </h2>
               <p className="text-muted-foreground font-sans mt-1">
                 {blogs.length} blog posts{" "}
@@ -512,7 +495,12 @@ const createMutation = useMutation({
             </div>
             {role === "admin" && (
               <div className="badge badge-lg badge-primary font-sans">
-                Admin View
+                Admin View - All Blogs
+              </div>
+            )}
+            {role === "agent" && (
+              <div className="badge badge-lg badge-warning font-sans">
+                Agent View - Your Blogs
               </div>
             )}
           </div>
@@ -539,15 +527,19 @@ const createMutation = useMutation({
               No Blog Posts Yet
             </h3>
             <p className="text-muted-foreground font-sans mb-6">
-              Start sharing your insurance knowledge and insights with the
-              community
+              {role === "admin" 
+                ? "No blogs have been published yet" 
+                : "Start sharing your insurance knowledge and insights with the community"
+              }
             </p>
-            <button
-              onClick={handleCreate}
-              className="btn btn-primary font-sans"
-            >
-              Create Your First Blog Post
-            </button>
+            {(role === "agent" || role === "admin") && (
+              <button
+                onClick={handleCreate}
+                className="btn btn-primary font-sans"
+              >
+                Create Your First Blog Post
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -692,26 +684,27 @@ const createMutation = useMutation({
           </div>
         )}
       </div>
+
       <BlogModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         mode="create"
         formData={formData}
-        onInputChange={handleInputChange} // Now this function exists
+        onInputChange={handleInputChange}
         onSubmit={handleSubmit}
         isLoading={createMutation.isLoading}
-        user={user} // Add this line
+        user={user}
       />
-      {/* Edit Modal */}
+
       <BlogModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         mode="edit"
         formData={formData}
-        onInputChange={handleInputChange} // Now this function exists
+        onInputChange={handleInputChange}
         onSubmit={handleSubmit}
         isLoading={updateMutation.isLoading}
-        user={user} // Add this line
+        user={user}
       />
     </div>
   );
