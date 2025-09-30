@@ -24,6 +24,7 @@ import PaymentStatus from "@/Pages/Dashboard/Customer/PaymentStatus/PaymentStatu
 import PaymentPage from "@/Pages/Dashboard/Customer/PaymentPage/PaymentPage";
 import PaymentSuccess from "@/Pages/Dashboard/Customer/PaymentPage/PaymentSuccess";
 import ManageTransactions from "@/Pages/Dashboard/Admin/ManageTransactions/ManageTransactions";
+import ClaimRequest from "@/Pages/Dashboard/Customer/ClaimRequest/ClaimRequest";
 
 
 
@@ -102,6 +103,10 @@ export const router = createBrowserRouter([
       {
          path:"/dashboard/manage-transactions",
          element:<ManageTransactions></ManageTransactions>
+      },
+      {
+         path:"/dashboard/claim-reuest",
+         element:<ClaimRequest></ClaimRequest>
       },
     ],
   },
