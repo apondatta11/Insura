@@ -27,6 +27,7 @@ import ManageTransactions from "@/Pages/Dashboard/Admin/ManageTransactions/Manag
 import ClaimRequest from "@/Pages/Dashboard/Customer/ClaimRequest/ClaimRequest";
 import PolicyClearance from "@/Pages/Dashboard/Merchant/PolicyClearance/PolicyClearance";
 import ManageBlogs from "@/Pages/Dashboard/Shared/ManageBlogs/ManageBlogs";
+import Profile from "@/Pages/Dashboard/Shared/ProfilePage/Profile";
 
 
 
@@ -118,6 +119,10 @@ export const router = createBrowserRouter([
         path:"/dashboard/manage-blogs",
         element:<ManageBlogs></ManageBlogs>
       },
+      {
+        path: "/dashboard/profile",
+        element: <Profile></Profile>
+      }
     ],
   },
   {
