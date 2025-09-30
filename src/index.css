@@ -126,6 +126,12 @@
   --shadow-xl: 2px 3px 5px 0px hsl(28 13% 20% / 0.12), 2px 8px 10px -1px hsl(28 13% 20% / 0.12);
   --shadow-2xl: 2px 3px 5px 0px hsl(28 13% 20% / 0.30);
   --tracking-normal: 0em;
+    --stripe-text: var(--foreground);
+  --stripe-background: var(--card);
+  --stripe-border: var(--border);
+  --stripe-placeholder: var(--muted-foreground);
+  --stripe-focus: var(--primary);
+  --stripe-error: var(--destructive);
 }
 
 .dark {
@@ -181,6 +187,12 @@
   --shadow-lg: 2px 3px 5px 0px hsl(28 13% 20% / 0.12), 2px 4px 6px -1px hsl(28 13% 20% / 0.12);
   --shadow-xl: 2px 3px 5px 0px hsl(28 13% 20% / 0.12), 2px 8px 10px -1px hsl(28 13% 20% / 0.12);
   --shadow-2xl: 2px 3px 5px 0px hsl(28 13% 20% / 0.30);
+    --stripe-text: var(--foreground);
+  --stripe-background: var(--card);
+  --stripe-border: var(--border);
+  --stripe-placeholder: var(--muted-foreground);
+  --stripe-focus: var(--primary);
+  --stripe-error: var(--destructive);
 }
 
 @layer base {
@@ -191,4 +203,18 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }
+}
+
+.StripeElement {
+  color: var(--stripe-text) !important;
+  background: var(--stripe-background) !important;
+}
+
+.StripeElement .InputElement {
+  color: var(--stripe-text) !important;
+  background: var(--stripe-background) !important;
+}
+
+.StripeElement .InputElement::placeholder {
+  color: var(--stripe-placeholder) !important;
 }

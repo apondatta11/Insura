@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import useAxiosSecure from "@/Hooks/useAxiosSecure";
 import useAuth from "@/Hooks/useAuth";
@@ -28,8 +28,6 @@ import {
   Clock,
   AlertCircle,
   Loader2,
-  FileText,
-  TrendingUp,
   Shield,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -82,7 +80,7 @@ const PaymentStatus = () => {
             console.error(`Error checking payment for application ${app._id}:`, error);
             return {
               ...app,
-              paymentStatus: 'due', // Default to due if error
+              paymentStatus: 'due', 
               hasPayment: false
             };
           }

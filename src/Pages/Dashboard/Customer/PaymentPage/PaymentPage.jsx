@@ -1,7 +1,7 @@
 // src/Pages/Dashboard/Customer/PaymentPage.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "@/Hooks/useAxiosSecure";
 import useAuth from "@/Hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const [policy, setPolicy] = useState(null);
   const [clientSecret, setClientSecret] = useState("");
@@ -55,7 +56,6 @@ const PaymentPage = () => {
       const response = await axiosSecure.post("/create-payment-intent", {
         amount: policyData.premiumAmount,
         applicationId: policyData._id,
-        policyName: policyData.policyName,
         userEmail: user?.email,
       });
 
@@ -68,34 +68,74 @@ const PaymentPage = () => {
     }
   };
 
-  const confirmPayment = useMutation({
+  // Record payment in database
+  // const recordPayment = useMutation({
+  //   mutationFn: async (paymentIntent) => {
+  //     const response = await axiosSecure.post("/payments", {
+  //       applicationId: policy._id,
+  //       userEmail: user?.email,
+  //       amount: policy.premiumAmount,
+  //       transactionId: paymentIntent.id,
+  //     });
+  //     return response.data;
+  //   },
+  //   onSuccess: (data) => {
+  //     toast.success("Payment completed successfully!");
+  //     // Refresh the payment status data
+  //     queryClient.invalidateQueries(["approvedApplicationsWithPayments"]);
+  //     navigate("/dashboard/payment-success", {
+  //       state: {
+  //         paymentData: data,
+  //         policy: policy,
+  //       },
+  //     });
+  //   },
+  //   onError: (error) => {
+  //     toast.error("Failed to record payment");
+  //     console.error("Payment recording error:", error);
+  //   },
+  // });
+
+  // const handlePaymentSuccess = (paymentIntent) => {
+  //   // Record the payment in our database
+  //   recordPayment.mutate(paymentIntent);
+  // };
+
+  const recordPayment = useMutation({
     mutationFn: async (paymentIntent) => {
-      const response = await axiosSecure.post("/confirm-payment", {
-        paymentIntentId: paymentIntent.id,
-        applicationId: policy._id,
-        userEmail: user?.email,
-        amount: paymentIntent.amount / 100, // Convert back to dollars
-      });
-      return response.data;
+        const response = await axiosSecure.post("/payments", {
+            applicationId: policy._id,
+            userEmail: user?.email,
+            amount: policy.premiumAmount,
+            transactionId: paymentIntent.id,
+        });
+        return response.data;
     },
     onSuccess: (data) => {
-      toast.success("Payment completed successfully!");
-      navigate("/dashboard/payment-success", {
-        state: {
-          paymentData: data.payment,
-          policy: policy,
-        },
-      });
+        toast.success("Payment completed successfully!");
+        // Refresh the payment status data
+        queryClient.invalidateQueries(["approvedApplicationsWithPayments"]);
+        navigate("/dashboard/payment-success", {
+            state: {
+                paymentData: {
+                    ...data,
+                    amount: policy.premiumAmount,
+                    transactionId: data.paymentId // or use the actual transaction ID
+                },
+                policy: policy,
+            },
+        });
     },
     onError: (error) => {
-      toast.error("Failed to confirm payment");
-      console.error("Payment confirmation error:", error);
+        toast.error("Failed to record payment");
+        console.error("Payment recording error:", error);
     },
-  });
+});
 
-  const handlePaymentSuccess = (paymentIntent) => {
-    confirmPayment.mutate(paymentIntent);
-  };
+const handlePaymentSuccess = (paymentIntent) => {
+    // Record the payment in our database
+    recordPayment.mutate(paymentIntent);
+};
 
   if (loading) {
     return (
@@ -125,7 +165,7 @@ const PaymentPage = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button
@@ -147,36 +187,8 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Payment Form Section */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <CreditCard className="h-5 w-5 text-primary" />
-                Payment Details
-              </CardTitle>
-              <CardDescription>
-                Enter your card information to complete the payment
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {clientSecret ? (
-                <PaymentForm
-                  amount={policy.premiumAmount}
-                  clientSecret={clientSecret}
-                  onSuccess={handlePaymentSuccess}
-                  isConfirming={confirmPayment.isLoading}
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-                  <p className="text-foreground">Initializing payment...</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Order Summary Section - Keep this exactly as before */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Order Summary Section - NOW ON THE LEFT */}
           <Card className="bg-card border-border h-fit">
             <CardHeader>
               <CardTitle className="text-foreground">Order Summary</CardTitle>
@@ -285,6 +297,34 @@ const PaymentPage = () => {
                   </span>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Payment Form Section - NOW ON THE RIGHT */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <CreditCard className="h-5 w-5 text-primary" />
+                Payment Details
+              </CardTitle>
+              <CardDescription>
+                Enter your card information to complete the payment
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {clientSecret ? (
+                <PaymentForm
+                  amount={policy.premiumAmount}
+                  clientSecret={clientSecret}
+                  onSuccess={handlePaymentSuccess}
+                  isConfirming={recordPayment.isLoading}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+                  <p className="text-foreground">Initializing payment...</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
