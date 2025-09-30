@@ -19,6 +19,12 @@ import ManageUsers from "@/Pages/Dashboard/Admin/ManageUsers/ManageUsers";
 import ManageApplications from "@/Pages/Dashboard/Admin/ManageApplications/ManageApplications";
 import MyPolicies from "@/Pages/Dashboard/Customer/MyPolicies/MyPolicies";
 import AssignedCustomers from "@/Pages/Dashboard/Merchant/AssignedCustomers/AssignedCustomers";
+import { StripeProvider } from "@/Components/Stripe/StripeProvider";
+import PaymentStatus from "@/Pages/Dashboard/Customer/PaymentStatus/PaymentStatus";
+import PaymentPage from "@/Pages/Dashboard/Customer/PaymentPage/PaymentPage";
+import PaymentSuccess from "@/Pages/Dashboard/Customer/PaymentPage/PaymentSuccess";
+
+
 
 export const router = createBrowserRouter([
   {
@@ -66,12 +72,31 @@ export const router = createBrowserRouter([
         element: <ManageApplications />,
       },
       {
-        path:"/dashboard/my-policies",
-        element: <MyPolicies></MyPolicies>
+        path: "/dashboard/my-policies",
+        element: <MyPolicies></MyPolicies>,
       },
       {
-        path:"/dashboard/assigned-customers",
-        element:<AssignedCustomers></AssignedCustomers>
+        path: "/dashboard/assigned-customers",
+        element: <AssignedCustomers></AssignedCustomers>,
+      },
+      {
+        path: "/dashboard/payment-status",
+        element: <PaymentStatus></PaymentStatus>,
+      },
+
+      {
+        path: "/dashboard/payment",
+        element: (
+          <PrivateRoute>
+            <StripeProvider>
+              <PaymentPage />
+            </StripeProvider>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/dashboard/payment-success",
+        element: <PaymentSuccess></PaymentSuccess>,
       },
     ],
   },
