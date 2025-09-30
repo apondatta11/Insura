@@ -30,6 +30,8 @@ import ManageBlogs from "@/Pages/Dashboard/Shared/ManageBlogs/ManageBlogs";
 import Profile from "@/Pages/Dashboard/Shared/ProfilePage/Profile";
 import AdminRoute from "@/Routes/AdminRoute";
 import CustomerRoute from "@/Routes/CustomerRoute";
+import Blog from "@/Pages/Public/Blog/Blog";
+import BlogDetails from "@/Pages/Public/Blog/BlogDetails";
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +66,14 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+  path: "/blog",
+  element: <Blog />,
+},
+{
+  path: "/blog/:id",
+  element: <BlogDetails />,
+},
     //   {
     //     path: "merchant/policies",
     //     element: <ManagePolicies />,

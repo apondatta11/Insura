@@ -98,7 +98,7 @@ const ApplicationForm = () => {
                 confirmButtonText: 'View Applications'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    navigate('/dashboard/my-applications');
+                    navigate('/dashboard/my-policies');
                 }
             });
         },
