@@ -26,6 +26,7 @@ import PaymentSuccess from "@/Pages/Dashboard/Customer/PaymentPage/PaymentSucces
 import ManageTransactions from "@/Pages/Dashboard/Admin/ManageTransactions/ManageTransactions";
 import ClaimRequest from "@/Pages/Dashboard/Customer/ClaimRequest/ClaimRequest";
 import PolicyClearance from "@/Pages/Dashboard/Merchant/PolicyClearance/PolicyClearance";
+import ManageBlogs from "@/Pages/Dashboard/Shared/ManageBlogs/ManageBlogs";
 
 
 
@@ -112,6 +113,10 @@ export const router = createBrowserRouter([
       {
         path:"/dashboard/policy-clearance",
         element:<PolicyClearance></PolicyClearance>
+      },
+      {
+        path:"/dashboard/manage-blogs",
+        element:<ManageBlogs></ManageBlogs>
       },
     ],
   },
