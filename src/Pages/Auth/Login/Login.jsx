@@ -17,23 +17,41 @@ const Login = () => {
     const [emailValue, setEmailValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const saveUserToDB = async (user) => {
-        try {
-            const userData = {
+const saveUserToDB = async (user) => {
+    try {
+        const existingUserResponse = await axiosInstance.get(`/users/${user.email}`);
+        const existingUser = existingUserResponse.data;
+
+        const userData = {
+            name: user.displayName || existingUser?.name || 'User',
+            email: user.email,
+            photoURL: user.photoURL || existingUser?.photoURL || '/default-avatar.png',
+            role: existingUser?.role || 'customer', 
+            createdAt: existingUser?.createdAt || new Date(),
+            lastLoggedAt: new Date()
+        };
+
+        await axiosInstance.put(`/users/${user.email}`, userData);
+        console.log('User saved/updated in database with role:', userData.role);
+        
+    } catch (error) {
+        if (error.response?.status === 404) {
+            const newUserData = {
                 name: user.displayName || 'User',
                 email: user.email,
                 photoURL: user.photoURL || '/default-avatar.png',
-                role: 'customer',
+                role: 'customer', 
                 createdAt: new Date(),
                 lastLoggedAt: new Date()
             };
-
-            await axiosInstance.put(`/users/${user.email}`, userData);
-            console.log('User saved/updated in database');
-        } catch (error) {
+            
+            await axiosInstance.put(`/users/${user.email}`, newUserData);
+            console.log('New user created with customer role');
+        } else {
             console.error('Error saving user to database:', error);
         }
-    };
+    }
+};
 
     const onSubmit = async (data) => {
         setIsLoading(true);
