@@ -8,7 +8,6 @@ import ForgotPassword from "@/Pages/Auth/ForgotPassword/ForgotPassword";
 import PrivateRoute from "@/Routes/PrivateRoute";
 import DashboardLayout from "@/Layouts/DashboardLayout/DashboardLayout";
 import ErrorPage from "@/Pages/ErrorPage/ErrorPage";
-import DashboardHome from "@/Pages/DashboardHome/DashboardHome";
 import MerchantRoute from "@/Routes/MerchantRoute";
 import ManagePolicies from "@/Pages/Dashboard/Admin/ManagePolicies/ManagePolicies";
 import AllPolicies from "@/Pages/Public/AllPolicies";
@@ -32,6 +31,7 @@ import AdminRoute from "@/Routes/AdminRoute";
 import CustomerRoute from "@/Routes/CustomerRoute";
 import Blog from "@/Pages/Public/Blog/Blog";
 import BlogDetails from "@/Pages/Public/Blog/BlogDetails";
+import ForbiddenPage from "@/Pages/ForbiddenPage/ForbiddenPage";
 
 export const router = createBrowserRouter([
   {
@@ -67,72 +67,17 @@ export const router = createBrowserRouter([
         ),
       },
       {
-  path: "/blog",
-  element: <Blog />,
-},
-{
-  path: "/blog/:id",
-  element: <BlogDetails />,
-},
-    //   {
-    //     path: "merchant/policies",
-    //     element: <ManagePolicies />,
-    //   },
-    //   {
-    //     path: "/dashboard/manage-users",
-    //     element: <ManageUsers />,
-    //   },
-    //   {
-    //     path: "/dashboard/manage-applications",
-    //     element: <ManageApplications />,
-    //   },
-    //   {
-    //     path: "/dashboard/my-policies",
-    //     element: <MyPolicies></MyPolicies>,
-    //   },
-    //   {
-    //     path: "/dashboard/assigned-customers",
-    //     element: <AssignedCustomers></AssignedCustomers>,
-    //   },
-    //   {
-    //     path: "/dashboard/payment-status",
-    //     element: <PaymentStatus></PaymentStatus>,
-    //   },
-
-    //   {
-    //     path: "/dashboard/payment",
-    //     element: (
-    //       <PrivateRoute>
-    //         <StripeProvider>
-    //           <PaymentPage />
-    //         </StripeProvider>
-    //       </PrivateRoute>
-    //     ),
-    //   },
-    //   {
-    //     path: "/dashboard/payment-success",
-    //     element: <PaymentSuccess></PaymentSuccess>,
-    //   },
-    //   {
-    //     path: "/dashboard/manage-transactions",
-    //     element: <ManageTransactions></ManageTransactions>,
-    //   },
-    //   {
-    //     path: "/dashboard/claim-reuest",
-    //     element: <ClaimRequest></ClaimRequest>,
-    //   },
-    //   {
-    //     path: "/dashboard/policy-clearance",
-    //     element: <PolicyClearance></PolicyClearance>,
-    //   },
-    //   {
-    //     path: "/dashboard/manage-blogs",
-    //     element: <ManageBlogs></ManageBlogs>,
-    //   },
-    //   {
-    //     path: "/dashboard/profile",
-    //     element: <Profile></Profile>,
-    //   },
+        path: "/blog",
+        element: <Blog />,
+      },
+      {
+        path: "/blog/:id",
+        element: <BlogDetails />,
+      },
+            {
+        path:"/forbidden",
+        element:<ForbiddenPage></ForbiddenPage>
+      }
     ],
   },
   {
@@ -272,14 +217,6 @@ export const router = createBrowserRouter([
           </AdminRoute>
         ),
       },
-    //   {
-    //     path: "manage-blogs",
-    //     element: (
-    //       <AdminRoute>
-    //         <ManageBlogs></ManageBlogs>
-    //       </AdminRoute>
-    //     ),
-    //   },
     ],
   },
   {
@@ -288,133 +225,3 @@ export const router = createBrowserRouter([
   },
 ]);
 
-// In Router.jsx - Restructure like this:
-
-//heheh
-
-// export const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     Component: Root,
-//     children: [
-//       {
-//         index: true,
-//         Component: HomeLayout,
-//       },
-//       {
-//         path: "/policies",
-//         element: <AllPolicies />,
-//       },
-//       {
-//         path: "/policies/:id",
-//         element: <PolicyDetails />,
-//       },
-//       // ... other public routes
-//     ],
-//   },
-//   {
-//     path: "/auth",
-//     Component: AuthLayout,
-//     children: [
-//       {
-//         path: "login",
-//         Component: Login,
-//       },
-//       {
-//         path: "register",
-//         Component: Register,
-//       },
-//       {
-//         path: "forgot-password",
-//         Component: ForgotPassword,
-//       },
-//     ],
-//   },
-//   {
-//     path: "/dashboard",
-//     element: (
-//       <PrivateRoute>
-//         <DashboardLayout />
-//       </PrivateRoute>
-//     ),
-//     children: [
-//       {
-//         index: true,
-//         element: <DashboardHome />,
-//       },
-//       // Admin Routes
-//       {
-//         path: "manage-applications",
-//         element: (
-//           <AdminRoute>
-//             <ManageApplications />
-//           </AdminRoute>
-//         ),
-//       },
-//       {
-//         path: "manage-users",
-//         element: (
-//           <AdminRoute>
-//             <ManageUsers />
-//           </AdminRoute>
-//         ),
-//       },
-//       // Agent Routes
-//       {
-//         path: "assigned-customers",
-//         element: (
-//           <MerchantRoute>
-//             <AssignedCustomers />
-//           </MerchantRoute>
-//         ),
-//       },
-//       {
-//         path: "policy-clearance",
-//         element: (
-//           <MerchantRoute>
-//             <PolicyClearance />
-//           </MerchantRoute>
-//         ),
-//       },
-//       // Customer Routes
-//       {
-//         path: "my-policies",
-//         element: <MyPolicies />,
-//       },
-//       {
-//         path: "payment-status",
-//         element: <PaymentStatus />,
-//       },
-//       // Shared Routes (All authenticated users)
-//       {
-//         path: "profile",
-//         element: <Profile />,
-//       },
-//       {
-//         path: "manage-blogs",
-//         element: <ManageBlogs />,
-//       },
-//     ],
-//   },
-//   // Private routes outside dashboard
-//   {
-//     path: "/quotes/:id",
-//     element: (
-//       <PrivateRoute>
-//         <Quotes />
-//       </PrivateRoute>
-//     ),
-//   },
-//   {
-//     path: "/apply/:id",
-//     element: (
-//       <PrivateRoute>
-//         <ApplicationForm />
-//       </PrivateRoute>
-//     ),
-//   },
-//   {
-//     path: "*",
-//     element: <ErrorPage />,
-//   },
-// ]);

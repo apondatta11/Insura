@@ -1,4 +1,3 @@
-//when user login save user to database 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
@@ -6,7 +5,6 @@ import SocialLogin from '../Register/SocialLogin';
 import useAuth from '@/Hooks/useAuth';
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
 import useAxios from '@/Hooks/useAxios';
-// import { toast } from 'react-toastify';
 import toast from 'react-hot-toast';
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
@@ -45,7 +43,7 @@ const Login = () => {
             
             await saveUserToDB(user);
             
-            toast.success('✅ Login successful! Welcome back!');
+            toast.success(' Login successful! Welcome back!');
             
             setTimeout(() => {
                 navigate(from, { replace: true });
@@ -70,7 +68,7 @@ const Login = () => {
                     break;
             }
             
-            toast.error(`❌ ${errorMessage}`);
+            toast.error(`  ${errorMessage}`);
         } finally {
             setIsLoading(false);
         }

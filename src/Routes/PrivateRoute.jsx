@@ -1,3 +1,4 @@
+import Loading from '@/Components/Loading/Loading';
 import { AuthContext } from '@/Provider/AuthContext';
 import React, { use } from 'react';
 import { Navigate, useLocation } from 'react-router';
@@ -7,7 +8,7 @@ const PrivateRoute = ({ children }) => {
     const location = useLocation();
     
     if(loading){
-        return <span className="loading loading-ring loading-xl min-h-screen"></span>
+        return <Loading></Loading>
     }
 
     if(!user){

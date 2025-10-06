@@ -1,5 +1,4 @@
-// src/pages/dashboard/customer/MyPolicies.jsx
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import useAxiosSecure from "@/Hooks/useAxiosSecure";
 import useAuth from "@/Hooks/useAuth";
@@ -33,6 +32,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/Components/ui/dialog";
 import { Textarea } from "@/Components/ui/textarea";
 import { Label } from "@/Components/ui/label";
@@ -46,8 +46,16 @@ import {
   Calendar,
   DollarSign,
   Clock,
+  XCircle,
+  AlertTriangle,
+  Download,
+  FileText,
+  User,
+  Shield,
 } from "lucide-react";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const MyPolicies = () => {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -55,14 +63,16 @@ const MyPolicies = () => {
   const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showReview, setShowReview] = useState(false);
+  const [showRejection, setShowRejection] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [generatingPDF, setGeneratingPDF] = useState(false);
 
+  const pdfRef = useRef();
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
 
-  // Fetch applications
   const {
     data: applications = [],
     isLoading,
@@ -78,7 +88,6 @@ const MyPolicies = () => {
     enabled: !!user?.email,
   });
 
-  // Filter applications based on search
   const filteredApplications = applications.filter(
     (app) =>
       app.policyDetails?.title
@@ -89,7 +98,6 @@ const MyPolicies = () => {
         .includes(searchQuery.toLowerCase())
   );
 
-  // Submit review mutation
   const submitReview = useMutation({
     mutationFn: async (reviewData) => {
       const response = await axiosSecure.post("/reviews", reviewData);
@@ -117,6 +125,11 @@ const MyPolicies = () => {
     setShowReview(true);
   };
 
+  const handleViewRejection = (application) => {
+    setSelectedPolicy(application);
+    setShowRejection(true);
+  };
+
   const handleSubmitReview = (e) => {
     e.preventDefault();
     if (rating === 0 || !feedback.trim()) {
@@ -129,7 +142,164 @@ const MyPolicies = () => {
       policyName: selectedPolicy.policyDetails?.title,
       rating: rating,
       feedback: feedback.trim(),
+      userEmail: user?.email,
     });
+  };
+
+  const generatePolicyPDF = async (application) => {
+    setGeneratingPDF(true);
+    try {
+      // Create PDF document
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Set background color for header
+      pdf.setFillColor(41, 112, 255);
+      pdf.rect(0, 0, 210, 40, "F");
+
+      // Header content
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(24);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("INSURANCE POLICY DOCUMENT", 105, 20, { align: "center" });
+      
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "normal");
+      pdf.text("Official Policy Certificate", 105, 28, { align: "center" });
+
+      // Policy details section
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(10, 50, 190, 40, "F");
+      pdf.setTextColor(0, 0, 0);
+      
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("POLICY INFORMATION", 20, 60);
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      
+      // Policy details
+      const policyDetails = [
+        { label: "Policy Number", value: `POL-${application._id?.slice(-8) || 'N/A'}` },
+        { label: "Policy Name", value: application.policyDetails?.title || 'N/A' },
+        { label: "Category", value: application.policyDetails?.category || 'N/A' },
+        { label: "Coverage Amount", value: formatCurrency(getCoverageAmount(application)) },
+        { label: "Term Duration", value: getDurationYears(application) },
+        { label: "Monthly Premium", value: formatCurrency(getMonthlyPremium(application)) },
+      ];
+
+      let yPosition = 70;
+      policyDetails.forEach((detail, index) => {
+        const x = index % 2 === 0 ? 20 : 110;
+        if (index % 2 === 0 && index !== 0) yPosition += 8;
+        
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`${detail.label}:`, x, yPosition);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(detail.value, x + 35, yPosition);
+      });
+
+      // Personal information section
+      yPosition += 20;
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(10, yPosition, 190, 35, "F");
+      
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("PERSONAL INFORMATION", 20, yPosition + 10);
+      
+      pdf.setFontSize(10);
+      const personalDetails = [
+        { label: "Full Name", value: application.fullName || 'N/A' },
+        { label: "Email", value: application.email || 'N/A' },
+        { label: "Phone", value: application.phone || 'N/A' },
+        { label: "Application Date", value: new Date(application.appliedAt).toLocaleDateString() },
+      ];
+
+      yPosition += 20;
+      personalDetails.forEach((detail, index) => {
+        const x = index % 2 === 0 ? 20 : 110;
+        if (index % 2 === 0 && index !== 0) yPosition += 8;
+        
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`${detail.label}:`, x, yPosition);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(detail.value, x + 30, yPosition);
+      });
+
+      // Nominee information section
+      yPosition += 20;
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(10, yPosition, 190, 25, "F");
+      
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("NOMINEE INFORMATION", 20, yPosition + 10);
+      
+      pdf.setFontSize(10);
+      const nomineeDetails = [
+        { label: "Nominee Name", value: application.nomineeName || 'N/A' },
+        { label: "Relationship", value: application.nomineeRelationship || 'N/A' },
+      ];
+
+      yPosition += 20;
+      nomineeDetails.forEach((detail, index) => {
+        const x = index === 0 ? 20 : 110;
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`${detail.label}:`, x, yPosition);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(detail.value, x + 35, yPosition);
+      });
+
+      // Terms and conditions
+      yPosition += 20;
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("IMPORTANT TERMS & CONDITIONS", 105, yPosition, { align: "center" });
+      
+      pdf.setFontSize(8);
+      pdf.setFont("helvetica", "normal");
+      const terms = [
+        "This policy document is proof of your insurance coverage.",
+        "Keep this document in a safe and accessible place.",
+        "Premium payments must be made on time to maintain coverage.",
+        "Contact customer service for any policy modifications or claims.",
+        "Policy terms and conditions are subject to the insurance provider's guidelines.",
+        "This document is generated electronically and is legally binding."
+      ];
+
+      yPosition += 10;
+      terms.forEach(term => {
+        if (yPosition > 270) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        pdf.text(`• ${term}`, 20, yPosition);
+        yPosition += 6;
+      });
+
+      // Footer
+      const currentDate = new Date().toLocaleDateString();
+      pdf.setFontSize(8);
+      pdf.setTextColor(128, 128, 128);
+      pdf.text(`Generated on: ${currentDate}`, 20, 285);
+      pdf.text("SecureLife Insurance Ltd.", 190, 285, { align: "right" });
+
+      // Save the PDF
+      const fileName = `policy-${application.policyDetails?.title?.replace(/\s+/g, '-').toLowerCase() || 'document'}-${application._id?.slice(-6) || 'unknown'}.pdf`;
+      pdf.save(fileName);
+      
+      toast.success("Policy document downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate policy document");
+    } finally {
+      setGeneratingPDF(false);
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -147,19 +317,14 @@ const MyPolicies = () => {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  // In MyPolicies.jsx, add these helper functions:
-
-  // Coverage amount comes from quoteData.coverageAmount (string)
   const getCoverageAmount = (application) => {
     return parseInt(application.quoteData?.coverageAmount) || 0;
   };
 
-  // Duration comes from quoteData.duration (string)
   const getDurationYears = (application) => {
     return `${application.quoteData?.duration || "N/A"} years`;
   };
 
-  // Monthly premium comes from estimatedPremium.monthly (object with $numberInt)
   const getMonthlyPremium = (application) => {
     return (
       application.estimatedPremium?.monthly?.$numberInt ||
@@ -168,7 +333,6 @@ const MyPolicies = () => {
     );
   };
 
-  // Format currency
   const formatCurrency = (amount) => {
     const numericAmount =
       typeof amount === "number" ? amount : parseInt(amount) || 0;
@@ -284,7 +448,7 @@ const MyPolicies = () => {
                   </p>
                 </div>
                 <div className="p-2 bg-primary/10 rounded-lg">
-                  <Star className="h-6 w-6 text-primary" />
+                  <FileText className="h-6 w-6 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -313,17 +477,16 @@ const MyPolicies = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Can Review</p>
+                  <p className="text-muted-foreground text-sm">Rejected</p>
                   <p className="text-2xl font-bold text-foreground">
                     {
-                      applications.filter(
-                        (app) => app.status === "approved" && !app.hasReview
-                      ).length
+                      applications.filter((app) => app.status === "rejected")
+                        .length
                     }
                   </p>
                 </div>
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Eye className="h-6 w-6 text-primary" />
+                <div className="p-2 bg-destructive/10 rounded-lg">
+                  <XCircle className="h-6 w-6 text-destructive" />
                 </div>
               </div>
             </CardContent>
@@ -385,7 +548,6 @@ const MyPolicies = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 text-foreground">
-                            {/* <DollarSign className="h-4 w-4 text-primary" /> */}
                             {formatCurrency(getCoverageAmount(app))}
                           </div>
                         </TableCell>
@@ -408,6 +570,23 @@ const MyPolicies = () => {
                               Details
                             </Button>
 
+                            {app.status === "approved" && (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => generatePolicyPDF(app)}
+                                disabled={generatingPDF}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                {generatingPDF ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-1" />
+                                ) : (
+                                  <Download className="h-4 w-4 mr-1" />
+                                )}
+                                PDF
+                              </Button>
+                            )}
+
                             {app.status === "approved" && !app.hasReview && (
                               <Button
                                 size="sm"
@@ -427,6 +606,18 @@ const MyPolicies = () => {
                                 className="bg-muted text-muted-foreground"
                               >
                                 Reviewed ✓
+                              </Button>
+                            )}
+
+                            {app.status === "rejected" && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleViewRejection(app)}
+                                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                              >
+                                <XCircle className="h-4 w-4 mr-1" />
+                                Rejected
                               </Button>
                             )}
                           </div>
@@ -514,6 +705,32 @@ const MyPolicies = () => {
                     </div>
                   </div>
                 </div>
+                
+                {/* Download PDF Button in Modal */}
+                {selectedPolicy.status === "approved" && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <Button
+                      onClick={() => generatePolicyPDF(selectedPolicy)}
+                      disabled={generatingPDF}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {generatingPDF ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Policy Document
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      Download your official policy certificate
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Personal Information */}
@@ -575,6 +792,70 @@ const MyPolicies = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Rejection Reason Modal */}
+      <Dialog open={showRejection} onOpenChange={setShowRejection}>
+        <DialogContent className="max-w-md bg-card border-border">
+          <DialogHeader>
+            <div className="flex items-center gap-3 text-destructive">
+              <div className="p-2 bg-destructive/10 rounded-full">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold">
+                  Application Rejected
+                </DialogTitle>
+                <DialogDescription className="text-destructive/80">
+                  Your policy application was not approved
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {selectedPolicy && (
+            <div className="space-y-4">
+              {/* Policy Info */}
+              <div className="bg-muted/50 p-4 rounded-lg border border-border">
+                <h4 className="font-semibold text-foreground mb-2">
+                  {selectedPolicy.policyDetails?.title}
+                </h4>
+                <div className="text-sm text-muted-foreground">
+                  Applied on {new Date(selectedPolicy.appliedAt).toLocaleDateString()}
+                </div>
+              </div>
+
+              {/* Rejection Reason */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-foreground">
+                  Reason for Rejection
+                </Label>
+                <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
+                  <p className="text-sm text-foreground leading-relaxed">
+                    {selectedPolicy.rejectionFeedback || 
+                     "Your application did not meet the required criteria for approval. Please review the policy requirements and consider applying again in the future."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Additional Info */}
+              {selectedPolicy.rejectedAt && (
+                <div className="text-xs text-muted-foreground text-center">
+                  Rejected on: {new Date(selectedPolicy.rejectedAt).toLocaleDateString()}
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              onClick={() => setShowRejection(false)}
+              className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              Close
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

@@ -1,4 +1,3 @@
-// src/pages/dashboard/agent/AssignedCustomers.jsx
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "@/Hooks/useAxiosSecure";
@@ -31,6 +30,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -48,20 +48,24 @@ import {
   CheckCircle,
   Loader2,
   Shield,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Textarea } from "@headlessui/react";
 
 const AssignedCustomers = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectionFeedback, setRejectionFeedback] = useState("");
+  const [customerToReject, setCustomerToReject] = useState(null);
 
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch assigned customers using the existing applications API
   const {
     data: assignedCustomers = [],
     isLoading,
@@ -72,17 +76,15 @@ const AssignedCustomers = () => {
     queryFn: async () => {
       console.log("📋 Fetching assigned customers for agent:", user?.email);
 
-      // Use the existing applications API with agentEmail parameter
       const response = await axiosSecure.get(
         `/applications?agentEmail=${user?.email}&status=${statusFilter}`
       );
-      console.log("✅ Found applications:", response.data);
+      console.log(" Found applications:", response.data);
       return response.data;
     },
     enabled: !!user?.email,
   });
 
-  // Update application status mutation
   const updateApplicationStatus = useMutation({
     mutationFn: async ({ applicationId, status }) => {
       const response = await axiosSecure.put(
@@ -108,7 +110,30 @@ const AssignedCustomers = () => {
     },
   });
 
-  // Filter customers based on search
+  const rejectApplication = useMutation({
+    mutationFn: async ({ applicationId, feedback }) => {
+      const response = await axiosSecure.put(
+        `/applications/${applicationId}/reject`,
+        {
+          feedback,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["assignedCustomers"]);
+      toast.success("Application rejected with feedback");
+      setIsRejectModalOpen(false);
+      setRejectionFeedback("");
+      setCustomerToReject(null);
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Failed to reject application";
+      toast.error(errorMessage);
+    },
+  });
+
   const filteredCustomers = assignedCustomers.filter(
     (customer) =>
       customer.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -119,10 +144,32 @@ const AssignedCustomers = () => {
   );
 
   const handleStatusChange = (applicationId, newStatus, customerName) => {
-    updateApplicationStatus.mutate({
-      applicationId,
-      status: newStatus,
-    });
+    if (newStatus === "rejected") {
+      const customer = assignedCustomers.find(
+        (app) => app._id === applicationId
+      );
+      setCustomerToReject(customer);
+      setIsRejectModalOpen(true);
+    } else {
+      updateApplicationStatus.mutate({
+        applicationId,
+        status: newStatus,
+      });
+    }
+  };
+
+  const handleRejectWithFeedback = () => {
+    if (!rejectionFeedback.trim()) {
+      toast.error("Please provide rejection feedback");
+      return;
+    }
+
+    if (customerToReject) {
+      rejectApplication.mutate({
+        applicationId: customerToReject._id,
+        feedback: rejectionFeedback.trim(),
+      });
+    }
   };
 
   const handleViewDetails = (customer) => {
@@ -154,19 +201,14 @@ const AssignedCustomers = () => {
     });
   };
 
-  // In AssignedCustomers.jsx, update the data access:
-
-  // Coverage amount comes from quoteData.coverageAmount (string)
   const getCoverageAmount = (customer) => {
     return parseInt(customer.quoteData?.coverageAmount) || 0;
   };
 
-  // Duration comes from quoteData.duration (string)
   const getDurationYears = (customer) => {
     return `${customer.quoteData?.duration || "N/A"} years`;
   };
 
-  // Monthly premium comes from estimatedPremium.monthly (object with $numberInt)
   const getMonthlyPremium = (customer) => {
     return (
       customer.estimatedPremium?.monthly?.$numberInt ||
@@ -175,7 +217,6 @@ const AssignedCustomers = () => {
     );
   };
 
-  // Format currency
   const formatCurrency = (amount) => {
     const numericAmount =
       typeof amount === "number" ? amount : parseInt(amount) || 0;
@@ -478,6 +519,104 @@ const AssignedCustomers = () => {
         </Card>
       </div>
 
+      {/* Rejection Modal */}
+      <Dialog open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
+        <DialogContent className="max-w-md bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center text-foreground flex items-center gap-2 justify-center">
+              <XCircle className="h-5 w-5 text-destructive" />
+              Reject Application
+            </DialogTitle>
+            <DialogDescription className="text-center text-foreground/70">
+              Provide feedback for rejecting {customerToReject?.fullName}'s
+              application
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex flex-col">
+              <Label
+                htmlFor="rejectionFeedback"
+                className="text-sm font-medium text-foreground"
+              >
+                Rejection Reason *
+              </Label>
+              <Textarea
+                id="rejectionFeedback"
+                placeholder="Please provide specific reasons for rejecting this application. This feedback will be visible to the customer."
+                value={rejectionFeedback}
+                onChange={(e) => setRejectionFeedback(e.target.value)}
+                rows={5}
+                className="resize-none border-border focus:border-primary bg-background mt-2 p-2"
+                required
+              />
+              <div className="text-sm text-muted-foreground mt-2">
+                {rejectionFeedback.length}/500 characters
+              </div>
+            </div>
+
+            {customerToReject && (
+              <div className="bg-muted/50 p-3 rounded-lg border border-border">
+                <h4 className="font-semibold text-sm text-foreground mb-2">
+                  Application Details:
+                </h4>
+                <div className="text-sm space-y-1">
+                  <div>
+                    <span className="text-muted-foreground">Customer:</span>{" "}
+                    {customerToReject.fullName}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Policy:</span>{" "}
+                    {customerToReject.policyDetails?.title}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Coverage:</span>{" "}
+                    {formatCurrency(getCoverageAmount(customerToReject))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setIsRejectModalOpen(false);
+                setRejectionFeedback("");
+                setCustomerToReject(null);
+              }}
+              disabled={rejectApplication.isLoading}
+              className="border-border text-foreground hover:bg-muted"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleRejectWithFeedback}
+              disabled={
+                rejectApplication.isLoading || !rejectionFeedback.trim()
+              }
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              {rejectApplication.isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Rejecting...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Reject Application
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Customer Details Modal */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -580,30 +719,30 @@ const AssignedCustomers = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-muted p-4 rounded-xl border border-border">
-                      <div className="text-2xl font-bold text-foreground">
-                        {formatCurrency(getCoverageAmount(selectedCustomer))}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Coverage Amount
-                      </div>
+                  <div className="bg-muted p-4 rounded-xl border border-border">
+                    <div className="text-2xl font-bold text-foreground">
+                      {formatCurrency(getCoverageAmount(selectedCustomer))}
                     </div>
-                    <div className="bg-muted p-4 rounded-xl border border-border">
-                      <div className="text-2xl font-bold text-foreground">
-                        {getDurationYears(selectedCustomer)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Term Duration
-                      </div>
+                    <div className="text-sm text-muted-foreground">
+                      Coverage Amount
                     </div>
-                    <div className="bg-muted p-4 rounded-xl border border-border">
-                      <div className="text-2xl font-bold text-foreground">
-                        {formatCurrency(getMonthlyPremium(selectedCustomer))}/mo
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Monthly Premium
-                      </div>
+                  </div>
+                  <div className="bg-muted p-4 rounded-xl border border-border">
+                    <div className="text-2xl font-bold text-foreground">
+                      {getDurationYears(selectedCustomer)}
                     </div>
+                    <div className="text-sm text-muted-foreground">
+                      Term Duration
+                    </div>
+                  </div>
+                  <div className="bg-muted p-4 rounded-xl border border-border">
+                    <div className="text-2xl font-bold text-foreground">
+                      {formatCurrency(getMonthlyPremium(selectedCustomer))}/mo
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Monthly Premium
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

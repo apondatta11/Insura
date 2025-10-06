@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 
 const axiosSecure = axios.create({
     baseURL: `https://assignment-12-server-sooty.vercel.app`
+    // baseURL: `http://localhost:3000`
 });
 
 const useAxiosSecure = () => {
@@ -15,7 +16,7 @@ const useAxiosSecure = () => {
             config.headers.Authorization = `Bearer ${user.accessToken}`;
             // console.log('Adding token to request:', user.accessToken ? 'Token exists' : 'No token');
         } else {
-            console.log('No user token available');
+            // console.log('No user token available');
         }
         return config;
     }, error => {

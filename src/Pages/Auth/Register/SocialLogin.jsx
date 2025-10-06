@@ -41,7 +41,7 @@ const SocialLogin = () => {
             
             await saveUserToDB(result.user);
             
-            toast.success('✅ Google Sign-In Successful! Welcome to Insura!');
+            toast.success(' Google Sign-In Successful! Welcome to Insura!');
             
             setTimeout(() => {
                 navigate(from, { replace: true });
@@ -49,7 +49,7 @@ const SocialLogin = () => {
             
         } catch (error) {
             console.error('Google sign-in error:', error);
-            toast.error('❌ Google Sign-In Failed. Please try again.');
+            toast.error('  Google Sign-In Failed. Please try again.');
         } finally {
             setIsLoading(false);
         }

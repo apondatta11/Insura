@@ -89,7 +89,7 @@ const Register = () => {
             await saveUserToDB(userCredential.user, data.name.trim(), profilePic);
             console.log('User saved to backend database');
 
-            toast.success('🎉 Registration successful! Welcome to Insura!');
+            toast.success(' Registration successful! Welcome to Insura!');
             
             setTimeout(() => {
                 navigate(from, { replace: true });
@@ -116,7 +116,7 @@ const Register = () => {
                     errorMessage = error.message || errorMessage;
             }
             
-            toast.error(`❌ ${errorMessage}`);
+            toast.error(`  ${errorMessage}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -134,7 +134,7 @@ const Register = () => {
         if (!validTypes.includes(image.type)) {
             const errorMsg = 'Please select a valid image file (JPEG, PNG, GIF, WebP)';
             setImageError(errorMsg);
-            toast.error(`❌ ${errorMsg}`);
+            toast.error(`  ${errorMsg}`);
             e.target.value = '';
             return;
         }
@@ -142,7 +142,7 @@ const Register = () => {
         if (image.size > maxSize) {
             const errorMsg = 'Image size too large. Please select an image under 5MB.';
             setImageError(errorMsg);
-            toast.error(`❌ ${errorMsg}`);
+            toast.error(`  ${errorMsg}`);
             e.target.value = '';
             return;
         }
@@ -171,7 +171,7 @@ const Register = () => {
 
             if (res.data.secure_url) {
                 setProfilePic(res.data.secure_url);
-                toast.success('✅ Profile picture uploaded successfully!');
+                toast.success(' Profile picture uploaded successfully!');
             } else {
                 throw new Error('Upload failed: No URL returned');
             }
@@ -180,7 +180,7 @@ const Register = () => {
             console.error('Upload error:', err);
             const errorMsg = 'Image upload failed. Please try again.';
             setImageError(errorMsg);
-            toast.error(`❌ ${errorMsg}`);
+            toast.error(`  ${errorMsg}`);
         } finally {
             setIsUploading(false);
         }
@@ -189,7 +189,7 @@ const Register = () => {
     const removeProfilePic = () => {
         setProfilePic('');
         setImageError('');
-        toast.info('🗑️ Profile picture removed');
+        toast.info(' Profile picture removed');
     };
 
     return (

@@ -218,3 +218,36 @@
 .StripeElement .InputElement::placeholder {
   color: var(--stripe-placeholder) !important;
 }
+/* Custom animations for the loader */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 60%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s ease-in-out infinite;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}

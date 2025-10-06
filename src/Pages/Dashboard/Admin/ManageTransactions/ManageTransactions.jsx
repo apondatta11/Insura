@@ -69,7 +69,6 @@ const ManageTransactions = () => {
   });
   const [chartType, setChartType] = useState("line");
 
-  // Fetch all transactions with policy details
   const {
     data: transactionsData = [],
     isLoading,
@@ -81,13 +80,11 @@ const ManageTransactions = () => {
       const response = await axiosSecure.get("/payments");
       const payments = response.data;
       
-      // Fetch policy details for each payment to get actual policy names
       const transactionsWithPolicyNames = await Promise.all(
         payments.map(async (payment) => {
           try {
             if (payment.applicationId) {
                 console.log('Fetching policy details for application ID:', payment.applicationId);
-              // Fetch the application to get policy details
               const applicationResponse = await axiosSecure.get(`/applications/${payment.applicationId}`);
               const application = applicationResponse.data;
               console.log('Fetched application:', application);
@@ -118,10 +115,8 @@ const ManageTransactions = () => {
     },
   });
 
-  // Filter transactions based on filters
   const filteredTransactions = useMemo(() => {
     return transactionsData.filter(transaction => {
-      // Date range filter
       if (filters.dateRange !== "all") {
         const transactionDate = new Date(transaction.paymentDate);
         const now = new Date();
@@ -145,17 +140,14 @@ const ManageTransactions = () => {
         }
       }
 
-      // User filter (email search)
       if (filters.user && !transaction.userEmail.toLowerCase().includes(filters.user.toLowerCase())) {
         return false;
       }
 
-      // Policy filter - now using actual policy names
       if (filters.policy && !transaction.policyName.toLowerCase().includes(filters.policy.toLowerCase())) {
         return false;
       }
 
-      // General search
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
         const matches = 
@@ -170,7 +162,6 @@ const ManageTransactions = () => {
     });
   }, [transactionsData, filters]);
 
-  // Calculate stats from filtered data
   const stats = useMemo(() => {
     const totalIncome = filteredTransactions.reduce((sum, transaction) => {
       return transaction.status === "completed" ? sum + transaction.amount : sum;
@@ -194,15 +185,12 @@ const ManageTransactions = () => {
     };
   }, [filteredTransactions]);
 
-  // Get unique policy names for filter suggestions
   const uniquePolicyNames = useMemo(() => {
     const names = [...new Set(transactionsData.map(t => t.policyName))];
     return names.filter(name => name && name !== "Unknown Policy");
   }, [transactionsData]);
 
-  // Prepare chart data
   const chartData = useMemo(() => {
-    // Group by date for time series
     const dailyData = {};
     
     filteredTransactions
@@ -214,7 +202,7 @@ const ManageTransactions = () => {
         dailyData[dayKey] = (dailyData[dayKey] || 0) + transaction.amount;
       });
 
-    const labels = Object.keys(dailyData).slice(-30); // Last 30 days
+    const labels = Object.keys(dailyData).slice(-30); 
     const data = labels.map(label => dailyData[label] || 0);
 
     return {
@@ -265,7 +253,6 @@ const ManageTransactions = () => {
     },
   };
 
-  // Format currency
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -273,7 +260,6 @@ const ManageTransactions = () => {
     }).format(amount);
   };
 
-  // Format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -284,7 +270,6 @@ const ManageTransactions = () => {
     });
   };
 
-  // Get status badge
   const getStatusBadge = (status) => {
     const statusConfig = {
       completed: { variant: "default", label: "Success" },
@@ -300,7 +285,6 @@ const ManageTransactions = () => {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  // Clear filters
   const clearFilters = () => {
     setFilters({
       dateRange: "all",

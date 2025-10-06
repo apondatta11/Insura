@@ -1,22 +1,3 @@
-// import { Link } from "react-router";
-
-// const HeroBanner = () => (
-//     <div className="hero min-h-screen bg-[url('https://t4.ftcdn.net/jpg/08/14/51/95/360_F_814519583_aBeKi1mOCclfWWDRFOFlgtbQfrzViphL.jpg')] bg-content bg-center">
-//         <div className="hero-overlay bg-opacity-90"></div>
-//         <div className="w-[90vw] text-foreground flex justify-end align-middle">
-//             <div className="max-w-max text-right">
-//                 <h1 className="text-5xl font-bold mb-6">Discover Your Perfect Getaway</h1>
-//                 <p className="mb-8 text-lg">Explore breathtaking destinations with our expertly crafted tour packages</p>
-//                 <Link to="/allpackages" className="btn bg-primary btn-lg text-neutral-content">
-//                     Explore All Packages
-//                 </Link>
-//             </div>
-//         </div>
-//     </div>
-// );
-
-// export default HeroBanner;
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -151,15 +132,6 @@ const HeroBanner = () => {
                                     transition={{ delay: 0.7, duration: 0.7 }}
                                     className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
                                 >
-                                    <Link
-                                        to="/quote"
-                                        className="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary 
-                                                   text-primary-foreground font-semibold rounded-xl transition-all duration-300 
-                                                   transform hover:scale-105 hover:shadow-2xl shadow-lg gap-3"
-                                    >
-                                        {currentSlideData.ctaText}
-                                        <FaArrowRight className="group-hover:translate-x-1 transition-transform duration-200" />
-                                    </Link>
                                     
                                     <Link
                                         to="/policies"

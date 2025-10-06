@@ -12,7 +12,8 @@ import {
     FaBars,
     FaTimes,
     FaSignOutAlt,
-    FaCog
+    FaSun,
+    FaMoon
 } from 'react-icons/fa';
 import useUserRole from '@/Hooks/useUserRole';
 import { cn } from '@/lib/utils';
@@ -27,13 +28,31 @@ import { useNavigate } from 'react-router';
 const DashboardLayout = () => {
     const { role, roleLoading } = useUserRole();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
     const { user, logOut } = UseAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Auto-close sidebar on mobile when route changes
+    // Theme management
     useEffect(() => {
-        if (window.innerWidth < 1024) { // lg breakpoint
+        localStorage.setItem('theme', theme);
+        const html = document.documentElement;
+
+        html.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+    }, [theme]);
+
+    const handleThemeToggle = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+    };
+
+    useEffect(() => {
+        if (window.innerWidth < 1024) { 
             setSidebarOpen(false);
         }
     }, [location.pathname]);
@@ -65,6 +84,21 @@ const DashboardLayout = () => {
                             {sidebarOpen ? <FaTimes className="h-5 w-5" /> : <FaBars className="h-5 w-5" />}
                         </Button>
                         <div className="flex-1 font-medium">Insurance Dashboard</div>
+                        
+                        {/* Theme Toggle in Mobile Header */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleThemeToggle}
+                            className="mr-2"
+                        >
+                            {theme === 'light' ? (
+                                <FaMoon className="h-5 w-5" />
+                            ) : (
+                                <FaSun className="h-5 w-5" />
+                            )}
+                        </Button>
+
                         <div className="ml-auto flex items-center space-x-4">
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src={user?.photoURL} />
@@ -86,7 +120,6 @@ const DashboardLayout = () => {
             )}
 
             {/* Sidebar */}
-            {/* Always show on desktop, conditionally show on mobile based on sidebarOpen state */}
             <AnimatePresence>
                 {(!isMobile || sidebarOpen) && (
                     <motion.aside
@@ -111,9 +144,20 @@ const DashboardLayout = () => {
 
                         <div className="flex-1 overflow-y-auto py-4">
                             <nav className="space-y-1 px-4">
-                                <DashboardNavItem to="/dashboard" icon={<FaHome />}>
-                                    Profile
-                                </DashboardNavItem>
+                                {/* Profile link with exact matching */}
+                                <NavLink
+                                    to="/dashboard"
+                                    end={true}
+                                    className={({ isActive }) =>
+                                        cn(
+                                            'flex items-center gap-3 rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                                            isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                                        )
+                                    }
+                                >
+                                    <span className="flex h-5 w-5 items-center justify-center"><FaHome /></span>
+                                    <span>Profile</span>
+                                </NavLink>
                                 
                                 {/* Admin Routes */}
                                 {!roleLoading && role === 'admin' && (
@@ -174,7 +218,7 @@ const DashboardLayout = () => {
                             </nav>
                         </div>
 
-                        {/* User Profile & Logout */}
+                        {/* User Profile & Actions */}
                         <div className="p-4 border-t border-border/40 space-y-4">
                             <div className="flex items-center gap-4">
                                 <Avatar>
@@ -188,14 +232,35 @@ const DashboardLayout = () => {
                                     <p className="truncate text-sm text-muted-foreground">{user?.email}</p>
                                 </div>
                             </div>
-                            <Button
-                                variant="outline"
-                                className="w-full justify-start gap-2"
-                                onClick={handleLogout}
-                            >
-                                <FaSignOutAlt className="w-4 h-4" />
-                                Logout
-                            </Button>
+                            
+                            {/* Theme Toggle in Sidebar */}
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1 justify-start gap-2"
+                                    onClick={handleThemeToggle}
+                                >
+                                    {theme === 'light' ? (
+                                        <>
+                                            <FaMoon className="w-4 h-4" />
+                                            Dark Mode
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaSun className="w-4 h-4" />
+                                            Light Mode
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="flex-1 justify-start gap-2"
+                                    onClick={handleLogout}
+                                >
+                                    <FaSignOutAlt className="w-4 h-4" />
+                                    Logout
+                                </Button>
+                            </div>
                         </div>
                     </motion.aside>
                 )}
@@ -211,7 +276,7 @@ const DashboardLayout = () => {
     );
 };
 
-// Simple DashboardNavItem without any mobile closing logic
+// DashboardNavItem component
 const DashboardNavItem = ({ to, icon, children }) => {
     return (
         <NavLink

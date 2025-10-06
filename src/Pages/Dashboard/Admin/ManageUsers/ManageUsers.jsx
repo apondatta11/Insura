@@ -20,35 +20,32 @@ import {
     Crown,
     UserCog
 } from 'lucide-react';
-import useAxios from '@/Hooks/useAxios';
 import Swal from 'sweetalert2';
+import useAxiosSecure from '@/Hooks/useAxiosSecure';
 
 const ManageUsers = () => {
-    const axiosInstance = useAxios();
+    const axiosSecure = useAxiosSecure();
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
 
-    // Fetch users - FIXED: Extract users array from the response object
     const { data: response = {}, isLoading, error } = useQuery({
         queryKey: ['users', searchTerm, roleFilter],
         queryFn: async () => {
-            const res = await axiosInstance.get('/users', {
+            const res = await axiosSecure.get('/users', {
                 params: { search: searchTerm, role: roleFilter }
             });
             console.log('Users API Response:', res.data);
-            return res.data; // This returns {users: [], totalUsers: number, ...}
+            return res.data; 
         }
     });
 
-    // Extract users array and other data from the response object
     const users = response.users || [];
     const totalUsers = response.totalUsers || 0;
 
-    // Update user role mutation
     const updateUserRole = useMutation({
         mutationFn: async ({ userId, newRole }) => {
-            const res = await axiosInstance.patch(`/users/${userId}/role`, { role: newRole });
+            const res = await axiosSecure.patch(`/users/${userId}/role`, { role: newRole });
             return res.data;
         },
         onSuccess: () => {
@@ -70,10 +67,9 @@ const ManageUsers = () => {
         }
     });
 
-    // Delete user mutation
     const deleteUser = useMutation({
         mutationFn: async (userId) => {
-            const res = await axiosInstance.delete(`/users/${userId}`);
+            const res = await axiosSecure.delete(`/users/${userId}`);
             return res.data;
         },
         onSuccess: () => {

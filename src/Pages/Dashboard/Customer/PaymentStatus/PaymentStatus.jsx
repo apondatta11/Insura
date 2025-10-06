@@ -40,7 +40,6 @@ const PaymentStatus = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Fetch approved applications AND payment status
   const {
     data: approvedApplications = [],
     isLoading,
@@ -51,19 +50,16 @@ const PaymentStatus = () => {
     queryFn: async () => {
       console.log("📋 Fetching approved applications for:", user?.email);
       
-      // Get approved applications
       const applicationsResponse = await axiosSecure.get(
         `/applications?email=${user?.email}&status=approved`
       );
       
       const applications = applicationsResponse.data;
-      console.log("✅ Approved applications:", applications);
+      console.log(" Approved applications:", applications);
 
-      // For each application, check if payment exists
       const applicationsWithPaymentStatus = await Promise.all(
         applications.map(async (app) => {
           try {
-            // Check if payment exists for this application
             const paymentResponse = await axiosSecure.get(
               `/payments?applicationId=${app._id}`
             );
@@ -73,7 +69,7 @@ const PaymentStatus = () => {
             
             return {
               ...app,
-              paymentStatus, // Add payment status to application
+              paymentStatus, 
               hasPayment
             };
           } catch (error) {
@@ -93,7 +89,6 @@ const PaymentStatus = () => {
   });
 
   const handlePayNow = (application) => {
-    // Prepare policy data for payment page
     const policyData = {
       _id: application._id,
       policyName: application.policyDetails?.title,
@@ -104,7 +99,6 @@ const PaymentStatus = () => {
       applicationData: application,
     };
 
-    // Navigate to payment page with policy data
     navigate("/dashboard/payment", {
       state: {
         policy: policyData,
@@ -112,7 +106,6 @@ const PaymentStatus = () => {
     });
   };
 
-  // Helper functions
   const formatCurrency = (amount) => {
     const numericAmount = typeof amount === "number" ? amount : parseInt(amount) || 0;
     return new Intl.NumberFormat("en-US", {
@@ -153,21 +146,17 @@ const PaymentStatus = () => {
     );
   };
 
-  // Determine payment status for each application - NOW USES ACTUAL PAYMENT DATA
   const getPaymentStatus = (application) => {
     return application.paymentStatus || 'due';
   };
 
-  // Get next due date - handle both paid and unpaid applications
   const getNextDueDate = (application) => {
     if (application.paymentStatus === 'paid' && application.lastPaymentDate) {
-      // If paid, next due date is 30 days from last payment
       const lastPaymentDate = new Date(application.lastPaymentDate);
       const nextDueDate = new Date(lastPaymentDate);
       nextDueDate.setDate(nextDueDate.getDate() + 30);
       return nextDueDate;
     } else {
-      // If not paid, due date is 30 days from application date
       const appliedDate = new Date(application.appliedAt);
       const nextDueDate = new Date(appliedDate);
       nextDueDate.setDate(nextDueDate.getDate() + 30);
@@ -175,7 +164,6 @@ const PaymentStatus = () => {
     }
   };
 
-  // Get premium amount from application data
   const getPremiumAmount = (application) => {
     return (
       application.estimatedPremium?.monthly?.$numberInt ||
@@ -186,17 +174,14 @@ const PaymentStatus = () => {
     );
   };
 
-  // Get coverage amount from application data
   const getCoverageAmount = (application) => {
     return application.quoteData?.coverageAmount || 0;
   };
 
-  // Get duration from application data
   const getDuration = (application) => {
     return application.quoteData?.duration || "N/A";
   };
 
-  // Calculate stats based on ACTUAL payment status
   const totalPolicies = approvedApplications.length;
   const paidPolicies = approvedApplications.filter(
     (app) => getPaymentStatus(app) === 'paid'
@@ -383,7 +368,7 @@ const PaymentStatus = () => {
         </Card>
 
         {/* Payment Information */}
-        {approvedApplications.length > 0 && (
+        {/* {approvedApplications.length > 0 && (
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-lg text-foreground">
@@ -463,7 +448,7 @@ const PaymentStatus = () => {
               </div>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </div>
     </div>
   );

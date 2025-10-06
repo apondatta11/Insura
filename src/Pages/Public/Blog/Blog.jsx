@@ -1,39 +1,40 @@
-// src/Pages/Public/Blog/Blog.jsx
-import { useQuery } from '@tanstack/react-query';
-import useAxiosSecure from '@/Hooks/useAxiosSecure';
-import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "@/Hooks/useAxiosSecure";
+import { Helmet } from "react-helmet-async";
+import { useState } from "react";
+import { Link } from "react-router";
+import Loading from "@/Components/Loading/Loading";
 
 const Blog = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const axiosSecure = useAxiosSecure();
 
-  // Fetch all published blogs
-  const { data: blogs = [], isLoading, error } = useQuery({
-    queryKey: ['public-blogs'],
+  const {
+    data: blogs = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["public-blogs"],
     queryFn: async () => {
-      const response = await axiosSecure.get('/blogs');
+      const response = await axiosSecure.get("/blogs");
       return response.data;
     },
   });
 
-  // Filter blogs by category
-  const filteredBlogs = selectedCategory === 'all' 
-    ? blogs 
-    : blogs.filter(blog => blog.category === selectedCategory);
+  const filteredBlogs =
+    selectedCategory === "all"
+      ? blogs
+      : blogs.filter((blog) => blog.category === selectedCategory);
 
-  // Get unique categories
-  const categories = ['all', ...new Set(blogs.map(blog => blog.category))];
+  const categories = ["all", ...new Set(blogs.map((blog) => blog.category))];
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="text-muted-foreground font-serif">Loading articles...</p>
-        </div>
-      </div>
+      <Loading
+        message="Loading Insurance Articles..."
+        subMessage="Fetching the latest insurance insights and expert advice"
+        icon="file"
+      ></Loading>
     );
   }
 
@@ -60,7 +61,8 @@ const Blog = () => {
             Insurance Insights
           </h1>
           <p className="text-xl text-muted-foreground font-sans max-w-2xl mx-auto">
-            Expert advice, tips, and latest updates on insurance policies, financial planning, and securing your future.
+            Expert advice, tips, and latest updates on insurance policies,
+            financial planning, and securing your future.
           </p>
         </div>
       </section>
@@ -70,19 +72,24 @@ const Blog = () => {
         {/* Category Filter */}
         <div className="mb-12">
           <div className="flex flex-wrap gap-3 justify-center">
-            {categories.map(category => (
+            {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full font-sans text-sm font-medium transition-all duration-200 ${
                   selectedCategory === category
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'bg-sidebar text-foreground border border-border hover:bg-accent hover:text-accent-foreground'
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-sidebar text-foreground border border-border hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
-                {category === 'all' ? 'All Articles' : category.split('-').map(word => 
-                  word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' ')}
+                {category === "all"
+                  ? "All Articles"
+                  : category
+                      .split("-")
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")}
               </button>
             ))}
           </div>
@@ -96,16 +103,15 @@ const Blog = () => {
               No Articles Found
             </h3>
             <p className="text-muted-foreground font-sans">
-              {selectedCategory === 'all' 
-                ? 'No articles have been published yet.' 
-                : `No articles found in the ${selectedCategory} category.`
-              }
+              {selectedCategory === "all"
+                ? "No articles have been published yet."
+                : `No articles found in the ${selectedCategory} category.`}
             </p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {filteredBlogs.map(blog => (
+              {filteredBlogs.map((blog) => (
                 <BlogCard key={blog._id} blog={blog} />
               ))}
             </div>
@@ -127,15 +133,16 @@ const BlogCard = ({ blog }) => {
   const axiosSecure = useAxiosSecure();
 
   const truncateContent = (content, wordLimit = 25) => {
-    const words = content.split(' ');
+    const words = content.split(" ");
     if (words.length <= wordLimit) return content;
-    return words.slice(0, wordLimit).join(' ') + '...';
+    return words.slice(0, wordLimit).join(" ") + "...";
   };
 
   const formatCategory = (category) => {
-    return category.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return category
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   return (
@@ -143,15 +150,13 @@ const BlogCard = ({ blog }) => {
       {/* Blog Image */}
       <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center overflow-hidden">
         {blog.image ? (
-          <img 
-            src={blog.image} 
+          <img
+            src={blog.image}
             alt={blog.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="text-4xl text-primary/40">
-            📄
-          </div>
+          <div className="text-4xl text-primary/40">📄</div>
         )}
       </div>
 
@@ -181,27 +186,52 @@ const BlogCard = ({ blog }) => {
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
               <span className="text-xs font-sans font-medium text-primary">
-                {blog.author?.charAt(0)?.toUpperCase() || 'A'}
+                {blog.author?.charAt(0)?.toUpperCase() || "A"}
               </span>
             </div>
             <div>
               <p className="text-xs font-sans font-medium text-foreground">
-                {blog.author || 'Anonymous'}
+                {blog.author || "Anonymous"}
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               {new Date(blog.publishDate).toLocaleDateString()}
             </span>
             <span className="flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
               </svg>
               {blog.totalVisits || 0}
             </span>
@@ -209,7 +239,7 @@ const BlogCard = ({ blog }) => {
         </div>
 
         {/* Read More Button - This stays at bottom */}
-        <Link 
+        <Link
           to={`/blog/${blog._id}`}
           className="btn btn-outline btn-sm w-full font-sans border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200 mt-auto"
         >

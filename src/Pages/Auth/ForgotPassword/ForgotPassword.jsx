@@ -27,9 +27,6 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen w-[90vw] mx-auto">
-      {/* <Helmet>
-        <title>Password Reset</title>
-      </Helmet> */}
       <div className="card bg-cyan-50 shadow-xl w-full max-w-sm p-6">
         <h2 className="text-xl font-semibold text-center mb-4">Reset Password</h2>
         <form onSubmit={handleReset} className="space-y-4">

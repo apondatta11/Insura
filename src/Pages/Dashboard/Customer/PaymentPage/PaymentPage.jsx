@@ -1,4 +1,3 @@
-// src/Pages/Dashboard/Customer/PaymentPage.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,7 +38,6 @@ const PaymentPage = () => {
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Get policy data from navigation state
   useEffect(() => {
     if (location.state?.policy) {
       setPolicy(location.state.policy);
@@ -49,7 +47,6 @@ const PaymentPage = () => {
     }
   }, [location, navigate]);
 
-  // Initialize payment with Stripe
   const initializePayment = async (policyData) => {
     try {
       setLoading(true);
@@ -68,39 +65,6 @@ const PaymentPage = () => {
     }
   };
 
-  // Record payment in database
-  // const recordPayment = useMutation({
-  //   mutationFn: async (paymentIntent) => {
-  //     const response = await axiosSecure.post("/payments", {
-  //       applicationId: policy._id,
-  //       userEmail: user?.email,
-  //       amount: policy.premiumAmount,
-  //       transactionId: paymentIntent.id,
-  //     });
-  //     return response.data;
-  //   },
-  //   onSuccess: (data) => {
-  //     toast.success("Payment completed successfully!");
-  //     // Refresh the payment status data
-  //     queryClient.invalidateQueries(["approvedApplicationsWithPayments"]);
-  //     navigate("/dashboard/payment-success", {
-  //       state: {
-  //         paymentData: data,
-  //         policy: policy,
-  //       },
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     toast.error("Failed to record payment");
-  //     console.error("Payment recording error:", error);
-  //   },
-  // });
-
-  // const handlePaymentSuccess = (paymentIntent) => {
-  //   // Record the payment in our database
-  //   recordPayment.mutate(paymentIntent);
-  // };
-
   const recordPayment = useMutation({
     mutationFn: async (paymentIntent) => {
         const response = await axiosSecure.post("/payments", {
@@ -113,14 +77,13 @@ const PaymentPage = () => {
     },
     onSuccess: (data) => {
         toast.success("Payment completed successfully!");
-        // Refresh the payment status data
         queryClient.invalidateQueries(["approvedApplicationsWithPayments"]);
         navigate("/dashboard/payment-success", {
             state: {
                 paymentData: {
                     ...data,
                     amount: policy.premiumAmount,
-                    transactionId: data.paymentId // or use the actual transaction ID
+                    transactionId: data.paymentId 
                 },
                 policy: policy,
             },
@@ -133,7 +96,6 @@ const PaymentPage = () => {
 });
 
 const handlePaymentSuccess = (paymentIntent) => {
-    // Record the payment in our database
     recordPayment.mutate(paymentIntent);
 };
 

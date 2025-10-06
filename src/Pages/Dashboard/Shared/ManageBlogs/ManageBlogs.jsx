@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
 import useAuth from "@/Hooks/useAuth";
-import useUserRole from "@/Hooks/useUserRole"; // Import useUserRole
+import useUserRole from "@/Hooks/useUserRole";
 
 const BlogModal = ({
   isOpen,
@@ -37,7 +37,7 @@ const BlogModal = ({
             </div>
             <button
               onClick={onClose}
-              className="btn btn-ghost btn-sm btn-circle text-muted-foreground hover:text-foreground"
+              className="btn btn-ghost btn-sm btn-circle text-muted-foreground hover:text-foreground hover:bg-accent/50"
             >
               ✕
             </button>
@@ -126,14 +126,14 @@ const BlogModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-ghost font-sans text-foreground border-border"
+              className="btn btn-ghost font-sans text-foreground border-border hover:bg-accent"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary font-sans text-primary-foreground"
+              className="btn btn-primary font-sans text-primary-foreground bg-primary hover:bg-primary/90"
             >
               {isLoading ? (
                 <>
@@ -167,9 +167,8 @@ const ManageBlogs = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { role, roleLoading } = useUserRole(); // Use useUserRole hook
+  const { role, roleLoading } = useUserRole();
 
-  // Fix the query to properly handle admin vs agent
   const {
     data: blogs = [],
     isLoading,
@@ -179,26 +178,24 @@ const ManageBlogs = () => {
     queryFn: async () => {
       console.log("📝 Fetching blogs for role:", role, "user:", user?.email);
       
-      // Admin should see all blogs, agents should see only their blogs
       let endpoint = "/blogs";
       if (role === "agent") {
         endpoint = `/blogs?author=${user?.email}`;
       }
-      // For admin, no query parameter - gets all blogs
       
       console.log("📝 Fetching blogs from:", endpoint);
       const response = await axiosSecure.get(endpoint);
-      console.log("✅ Blogs fetched:", response.data.length);
+      console.log(" Blogs fetched:", response.data.length);
       return response.data;
     },
-    enabled: !!user?.email && !roleLoading, // Wait for role to load
+    enabled: !!user?.email && !roleLoading,
   });
 
   const createMutation = useMutation({
     mutationFn: async (blogData) => {
       console.log("📝 Creating blog:", blogData);
       const response = await axiosSecure.post("/blogs", blogData);
-      console.log("✅ Blog created response:", response.data);
+      console.log("Blog created response:", response.data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -214,12 +211,11 @@ const ManageBlogs = () => {
       queryClient.invalidateQueries(["blogs"]);
     },
     onError: (error) => {
-      console.error("❌ Blog creation failed:", error);
+      console.error(" Blog creation failed:", error);
       toast.error("Failed to publish blog: " + error.message);
     },
   });
 
-  // Update blog mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, blogData }) => {
       const response = await axiosSecure.patch(`/blogs/${id}`, blogData);
@@ -236,7 +232,6 @@ const ManageBlogs = () => {
     },
   });
 
-  // Delete blog mutation
   const deleteMutation = useMutation({
     mutationFn: async (blogId) => {
       const response = await axiosSecure.delete(`/blogs/${blogId}`);
@@ -321,7 +316,6 @@ const ManageBlogs = () => {
     }));
   };
 
-  // Show loading while role is being determined
   if (roleLoading || isLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
@@ -364,7 +358,7 @@ const ManageBlogs = () => {
           </div>
           <button
             onClick={handleCreate}
-            className="btn btn-primary font-sans text-primary-foreground px-6"
+            className="btn btn-primary font-sans text-primary-foreground px-6 bg-primary hover:bg-primary/90 border-primary hover:border-primary/90"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -386,7 +380,7 @@ const ManageBlogs = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="card bg-card border border-border rounded-xl shadow-sm p-6">
+        <div className="card bg-card border border-border rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-sans text-muted-foreground font-medium">
@@ -414,7 +408,7 @@ const ManageBlogs = () => {
           </div>
         </div>
 
-        <div className="card bg-card border border-border rounded-xl shadow-sm p-6">
+        <div className="card bg-card border border-border rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-sans text-muted-foreground font-medium">
@@ -451,7 +445,7 @@ const ManageBlogs = () => {
           </div>
         </div>
 
-        <div className="card bg-card border border-border rounded-xl shadow-sm p-6">
+        <div className="card bg-card border border-border rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-sans text-muted-foreground font-medium">
@@ -482,7 +476,7 @@ const ManageBlogs = () => {
 
       {/* Blogs Table */}
       <div className="card bg-card border border-border rounded-xl shadow-lg overflow-hidden">
-        <div className="p-6 border-b border-border">
+        <div className="p-6 border-b border-border bg-sidebar/30">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-2xl font-serif font-bold text-foreground">
@@ -494,12 +488,12 @@ const ManageBlogs = () => {
               </p>
             </div>
             {role === "admin" && (
-              <div className="badge badge-lg badge-primary font-sans">
+              <div className="badge badge-lg badge-primary font-sans px-4 py-3 bg-primary/20 text-primary border-primary/30">
                 Admin View - All Blogs
               </div>
             )}
             {role === "agent" && (
-              <div className="badge badge-lg badge-warning font-sans">
+              <div className="badge badge-lg badge-warning font-sans px-4 py-3 bg-warning/20 text-warning border-warning/30">
                 Agent View - Your Blogs
               </div>
             )}
@@ -535,7 +529,7 @@ const ManageBlogs = () => {
             {(role === "agent" || role === "admin") && (
               <button
                 onClick={handleCreate}
-                className="btn btn-primary font-sans"
+                className="btn btn-primary font-sans bg-primary hover:bg-primary/90 border-primary hover:border-primary/90"
               >
                 Create Your First Blog Post
               </button>
@@ -543,36 +537,41 @@ const ManageBlogs = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="table table-zebra w-full">
+            <table className="table w-full">
+              {/* Remove zebra striping and use cleaner design */}
               <thead>
-                <tr className="bg-sidebar border-b border-border">
-                  <th className="font-serif font-semibold text-foreground p-4">
+                <tr className="bg-sidebar/50 border-b border-border">
+                  <th className="font-serif font-semibold text-foreground p-4 text-left">
                     Blog Title
                   </th>
-                  <th className="font-serif font-semibold text-foreground p-4">
+                  <th className="font-serif font-semibold text-foreground p-4 text-left">
                     Category
                   </th>
                   {role === "admin" && (
-                    <th className="font-serif font-semibold text-foreground p-4">
+                    <th className="font-serif font-semibold text-foreground p-4 text-left">
                       Author
                     </th>
                   )}
-                  <th className="font-serif font-semibold text-foreground p-4">
+                  <th className="font-serif font-semibold text-foreground p-4 text-left">
                     Published
                   </th>
-                  <th className="font-serif font-semibold text-foreground p-4">
+                  <th className="font-serif font-semibold text-foreground p-4 text-left">
                     Views
                   </th>
-                  <th className="font-serif font-semibold text-foreground p-4">
+                  <th className="font-serif font-semibold text-foreground p-4 text-left">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {blogs.map((blog) => (
+                {blogs.map((blog, index) => (
                   <tr
                     key={blog._id}
-                    className="border-b border-border hover:bg-sidebar/50 transition-colors"
+                    className={`border-b border-border transition-colors ${
+                      index % 2 === 0 
+                        ? 'bg-card hover:bg-sidebar/30' 
+                        : 'bg-sidebar/10 hover:bg-sidebar/40'
+                    }`}
                   >
                     <td className="p-4">
                       <div className="font-serif font-semibold text-foreground">
@@ -583,7 +582,7 @@ const ManageBlogs = () => {
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="badge badge-outline badge-sm font-sans capitalize">
+                      <div className="badge badge-outline badge-sm font-sans capitalize px-3 py-2 bg-background border-border text-foreground">
                         {blog.category?.replace("-", " ") || "insurance-tips"}
                       </div>
                     </td>
@@ -623,7 +622,7 @@ const ManageBlogs = () => {
                             d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                           />
                         </svg>
-                        <span className="text-foreground">
+                        <span className="text-foreground font-medium">
                           {blog.totalVisits || 0}
                         </span>
                       </div>
@@ -632,7 +631,7 @@ const ManageBlogs = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEdit(blog)}
-                          className="btn btn-outline btn-sm font-sans text-foreground border-border hover:bg-sidebar"
+                          className="btn btn-outline btn-sm font-sans text-foreground border-border hover:bg-accent hover:border-accent px-3"
                         >
                           <svg
                             className="w-4 h-4 mr-1"
@@ -652,7 +651,7 @@ const ManageBlogs = () => {
                         <button
                           onClick={() => handleDelete(blog)}
                           disabled={deleteMutation.isLoading}
-                          className="btn btn-outline btn-sm font-sans text-error border-error hover:bg-error hover:text-error-foreground"
+                          className="btn btn-outline btn-sm font-sans text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground px-3"
                         >
                           {deleteMutation.isLoading ? (
                             <span className="loading loading-spinner loading-xs"></span>

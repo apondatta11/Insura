@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "@/Hooks/useAxiosSecure";
 import { Helmet } from "react-helmet-async";
 import { useParams, Link, useNavigate } from "react-router";
+import Loading from "@/Components/Loading/Loading";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -24,12 +25,11 @@ const BlogDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="text-muted-foreground font-serif">Loading article...</p>
-        </div>
-      </div>
+      <Loading
+        message="Loading Your Wanted Insurance Article Details..."
+        subMessage="Fetching the latest insurance insights and expert advice"
+        icon="file"
+      ></Loading>
     );
   }
 
@@ -37,7 +37,7 @@ const BlogDetails = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">❌</div>
+          <div className="text-6xl mb-4"> </div>
           <h3 className="text-2xl font-serif font-bold text-foreground mb-4">
             Article Not Found
           </h3>

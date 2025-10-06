@@ -61,7 +61,6 @@ const ClaimRequest = () => {
     enabled: !!user?.email,
   });
 
-  // Fetch existing claims
   const { data: existingClaims = [], isLoading: claimsLoading } = useQuery({
     queryKey: ["userClaims", user?.email],
     queryFn: async () => {
@@ -70,7 +69,7 @@ const ClaimRequest = () => {
     },
     enabled: !!user?.email,
   });
-  // Combine applications with claim status - all logic on frontend
+
   const applicationsWithClaimStatus = approvedApplications.map(
     (application) => {
       const existingClaim = existingClaims.find(
@@ -85,12 +84,10 @@ const ClaimRequest = () => {
     }
   );
 
-  // Policies eligible for new claims (not_claimed status)
   const eligiblePolicies = applicationsWithClaimStatus.filter(
     (app) => app.claimStatus === "not_claimed"
   );
 
-  // Submit claim mutation
   const submitClaim = useMutation({
     mutationFn: async (claimData) => {
       const response = await axiosSecure.post("/claims", claimData);
@@ -107,7 +104,7 @@ const ClaimRequest = () => {
         "Claim already submitted for this policy"
       ) {
         toast.error("Claim already exists for this policy");
-        queryClient.invalidateQueries(["userClaims"]); // Refresh claims data
+        queryClient.invalidateQueries(["userClaims"]); 
       } else {
         toast.error("Failed to submit claim");
       }
@@ -118,14 +115,13 @@ const ClaimRequest = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file type and size
       const validTypes = [
         "application/pdf",
         "image/jpeg",
         "image/png",
         "image/jpg",
       ];
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 5 * 1024 * 1024;
 
       if (!validTypes.includes(file.type)) {
         toast.error("Please upload a PDF or image file (JPEG, PNG, JPG)");
@@ -141,58 +137,6 @@ const ClaimRequest = () => {
     }
   };
 
-  //   const handleSubmitClaim = async () => {
-  //     if (!selectedPolicy) {
-  //       toast.error("Please select a policy");
-  //       return;
-  //     }
-
-  //     if (!reason.trim()) {
-  //       toast.error("Please provide a reason for the claim");
-  //       return;
-  //     }
-
-  //     if (!documentFile) {
-  //       toast.error("Please upload a supporting document");
-  //       return;
-  //     }
-
-  //     // Double-check on frontend that policy is still eligible
-  //     const currentPolicyStatus = applicationsWithClaimStatus.find(
-  //       (app) => app._id === selectedPolicy._id
-  //     )?.claimStatus;
-
-  //     if (currentPolicyStatus !== "not_claimed") {
-  //       toast.error("This policy already has a claim submitted");
-  //       queryClient.invalidateQueries(["userClaims"]); // Refresh data
-  //       return;
-  //     }
-
-  //     setIsSubmitting(true);
-
-  //     try {
-  //       // In a real app, you'd upload the file to cloud storage
-  //       // For now, we'll simulate file upload and store file name
-  //       const documentUrl = `uploaded/${documentFile.name}`;
-
-  //       const claimData = {
-  //         applicationId: selectedPolicy._id,
-  //         policyName: getPolicyName(selectedPolicy), // Use the direct function
-  //         reason: reason.trim(),
-  //         documentUrl: documentUrl,
-  //         userEmail: user.email,
-  //       };
-
-  //       submitClaim.mutate(claimData);
-  //     } catch (error) {
-  //       toast.error("Failed to process claim");
-  //       console.error("Claim processing error:", error);
-  //     } finally {
-  //       setIsSubmitting(false);
-  //     }
-  //   };
-
-  // Update the handleSubmitClaim function in ClaimRequest.jsx
 
   const handleSubmitClaim = async () => {
     if (!selectedPolicy) {
@@ -210,21 +154,19 @@ const ClaimRequest = () => {
       return;
     }
 
-    // Double-check on frontend that policy is still eligible
     const currentPolicyStatus = applicationsWithClaimStatus.find(
       (app) => app._id === selectedPolicy._id
     )?.claimStatus;
 
     if (currentPolicyStatus !== "not_claimed") {
       toast.error("This policy already has a claim submitted");
-      queryClient.invalidateQueries(["userClaims"]); // Refresh data
+      queryClient.invalidateQueries(["userClaims"]); 
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append("document", documentFile);
       formData.append("applicationId", selectedPolicy._id);
@@ -299,7 +241,6 @@ const ClaimRequest = () => {
       title: "Claim Approved!",
       html: `
         <div class="text-left">
-          <p><strong>Claim ID:</strong> ${claim.claimId}</p>
           <p><strong>Policy:</strong> ${claim.policyName}</p>
           <p><strong>Submitted:</strong> ${new Date(
             claim.submittedAt
@@ -313,7 +254,6 @@ const ClaimRequest = () => {
       cancelButtonText: "Close",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Simulate download
         toast.success("Claim details downloaded");
       }
     });
@@ -645,7 +585,7 @@ const ClaimRequest = () => {
         </div>
 
         {/* Instructions */}
-        <Card className="bg-card border-border">
+        {/* <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-foreground">
               Claim Process Information
@@ -704,7 +644,7 @@ const ClaimRequest = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
