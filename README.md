@@ -1,12 +1,74 @@
-# React + Vite
+# 🛡️ Insura - Comprehensive Insurance Management Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Insura Banner](https://i.ibb.co.com/8LKZXt7f/Screenshot-2025-10-17-at-6-34-40-PM.png)
 
-Currently, two official plugins are available:
+A full-stack insurance management system with role-based access, policy management, payment processing, and claim handling.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Live Demo & Repository
 
-## Expanding the ESLint configuration
+- **🌐 Live Site**: [https://assignment-12-client-d6f9a.web.app/](https://assignment-12-client-d6f9a.web.app/)
+- **💻 Client Repository**: [https://github.com/apondatta11/Insura](https://github.com/apondatta11/Insura)
+- **🔄 Server Repository**: [Include your server repo link here]
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Tech Stack
+
+**Frontend:**
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+
+**Backend:**
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+
+**Payment & Services:**
+![Stripe](https://img.shields.io/badge/Stripe-008CDD?style=for-the-badge&logo=stripe&logoColor=white)
+
+## ✨ Key Features
+
+- 🔐 **Multi-role System** (Admin, Merchant, Customer)
+- 📋 **Policy Management & Applications**
+- 💳 **Stripe Payment Integration**
+- 🏥 **Claim Request Processing**
+- 📝 **Blog Management System**
+- 📊 **Real-time Transaction Tracking**
+- 🔒 **Secure Authentication & Authorization**
+
+## 🎯 Project Overview
+
+Insura is a comprehensive insurance management platform that streamlines the entire insurance process from policy creation to claim settlement. The system supports multiple user roles with customized dashboards and functionalities.
+
+## 🚧 Challenges & Solutions
+
+### Technical Challenges:
+- **Complex Role-based Access Control** - Implemented secure middleware for different user types
+- **Stripe Payment Integration** - Created secure transaction flow with webhook handling
+- **Policy State Management** - Developed efficient state management for application workflows
+- **Real-time Updates** - Implemented real-time status tracking for claims and transactions
+
+## 📦 Installation & Setup
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB Atlas account
+- Firebase account
+- Stripe account
+
+### Client Setup
+```bash
+# Clone the repository
+git clone https://github.com/apondatta11/Insura.git
+cd Insura
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+# Create .env file with:
+REACT_APP_API_URL=your_api_url
+REACT_APP_STRIPE_PUBLISHABLE_KEY=your_stripe_key
+REACT_APP_FIREBASE_CONFIG=your_firebase_config
+
+# Run the application
+npm start
