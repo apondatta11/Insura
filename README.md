@@ -8,7 +8,7 @@ A full-stack insurance management system with role-based access, policy manageme
 
 - **🌐 Live Site**: [https://assignment-12-client-d6f9a.web.app/](https://assignment-12-client-d6f9a.web.app/)
 - **💻 Client Repository**: [https://github.com/apondatta11/Insura](https://github.com/apondatta11/Insura)
-- **🔄 Server Repository**: [Include your server repo link here]
+- **🔄 Server Repository**: [https://github.com/apondatta11/assignment-12-server]
 
 ## 🛠️ Tech Stack
 
