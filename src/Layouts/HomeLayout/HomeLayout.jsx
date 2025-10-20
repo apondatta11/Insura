@@ -1,4 +1,6 @@
+import ClaimsGuideSection from '@/Pages/Home/ClaimsGuideSection'
 import CustomerReviews from '@/Pages/Home/CustomerReviews'
+import FAQSection from '@/Pages/Home/FAQSection'
 import HeroBanner from '@/Pages/Home/HeroBanner'
 import LatestBlogs from '@/Pages/Home/LatestBlogs'
 import MeetOurAgents from '@/Pages/Home/MeetOurAgents'
@@ -15,6 +17,8 @@ const HomeLayout = () => {
       <LatestBlogs></LatestBlogs>
       <Newsletter></Newsletter>
       <MeetOurAgents></MeetOurAgents>
+      <ClaimsGuideSection></ClaimsGuideSection>
+      <FAQSection></FAQSection>
     </div>
   )
 }

@@ -32,6 +32,8 @@ import CustomerRoute from "@/Routes/CustomerRoute";
 import Blog from "@/Pages/Public/Blog/Blog";
 import BlogDetails from "@/Pages/Public/Blog/BlogDetails";
 import ForbiddenPage from "@/Pages/ForbiddenPage/ForbiddenPage";
+import AdminOverview from "@/Pages/Dashboard/Admin/AdminOverview";
+import UserOverview from "@/Pages/Dashboard/Customer/UserOverview";
 
 export const router = createBrowserRouter([
   {
@@ -117,6 +119,12 @@ export const router = createBrowserRouter([
 
       // Customer Routes
       {
+        path:"user-overview",
+        element:<CustomerRoute>
+          <UserOverview></UserOverview>
+        </CustomerRoute>
+      },
+      {
         path: "my-policies",
         element: (
           <CustomerRoute>
@@ -184,7 +192,12 @@ export const router = createBrowserRouter([
       },
 
       // admin only routes
-
+      {
+        path:"admin-overview",
+        element:<AdminRoute>
+          <AdminOverview></AdminOverview>
+        </AdminRoute>
+      },
       {
         path: "manage-applications",
         element: (

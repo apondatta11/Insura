@@ -299,3 +299,4 @@ const AllPolicies = () => {
 };
 
 export default AllPolicies;
+
